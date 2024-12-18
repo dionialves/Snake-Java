@@ -1,42 +1,81 @@
 import java.awt.*;
+import java.util.Random;
 
 public class Game {
-    private final int wight = GameEngine.WIDTH - 40;
-    private final int height = GameEngine.HEIGHT - 80;
-    private final int top = 60;
-    private final int left = 20;
+    public static final int WIGHT = GameEngine.WIDTH -  Snake.BODYSIZE *2;
+    public static final int HEIGHT = GameEngine.HEIGHT - (Snake.BODYSIZE * 2);
+    public static final int TOP = 40;
+    public static final int LEFT = 40;
     private final int bottom = 20;
     private boolean gameOver = false;
     private boolean isVisible = false;
-    public static String DIRECTION = "RIGHT";
+    public static String direction = "RIGHT";
+    private final Random random = new Random();
 
     private int timer = 0;
+    private int timerIsMov = 0;
+    int count = 0;
 
-    private final Snake snake = new Snake();
-    private final Snake copySnake = new Snake();
-    private final Food food = new Food();
+    private final Snake snake = new Snake(direction);
+    private final Snake copySnake = new Snake(direction);
+    private final Foods food = new Foods();
 
     private int x = 60;
     private int y = 300;
 
+    public Game() {
+        this.coordinatesOfFood();
+    }
+
     public void update() {
         this.setTimer(this.getTimer() + 1);
 
-        if (this.getTimer() % 10 == 0) {
+        if (this.isFoodEaten()) {
+            this.coordinatesOfFood();
+            this.snake.addBody();
+        }
 
+        if (!this.gameOver) {
+            this.snake.update();
+            if (this.hasCollision()) {
+                this.setGameOver(true);
+                this.setVisible(false);
+                System.out.println("Collision Detected");
+            }
+        }
+
+
+ /*
+        for (int i = 0; i < this.snake.getBody().size(); i++) {
+            System.out.println(this.snake.getBody().get(i));
+        }
+
+        for (int i = 0; i < this.snake.getPositions().size(); i++) {
+            System.out.println(
+                    "size: " + i + "| x: " +
+                            this.snake.getPositions().get(i)[0] +
+                            ", y: " + this.snake.getPositions().get(i)[1] +
+                            ", Direção: " + this.snake.getPositions().get(i)[2]);
+        }
+
+     */
+
+        if (this.getTimer() % 10 == 0) {
+            // Timer para a movimentação da cabeça
+            this.setTimerIsMov(this.getTimerIsMov() + 1);
             this.setVisible(!this.isVisible());
 
             if (!this.gameOver) {
-                this.copySnake.setBody(this.snake.cloneBody());
 
-                this.snake.update(Game.DIRECTION);
+                if (getTimerIsMov() == 4) {
+                    this.snake.changeDirection(Game.direction);
+                    this.setTimerIsMov(0);
+                }
+
+
                 this.setTimer(0);
 
-                if (this.hasCollision()) {
-                    this.setGameOver(true);
-                    this.setVisible(false);
-                    System.out.println("Collision Detected");
-                }
+
             }
         }
     }
@@ -44,64 +83,124 @@ public class Game {
     public void draw(Graphics2D g2d) {
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Arial", Font.BOLD, 24));
-        g2d.drawString("Score:", this.getLeft(), this.getTop()-20);
+        g2d.drawString("Score:", Game.LEFT, Game.TOP-10);
 
         g2d.setFont(new Font("Arial", Font.PLAIN, 16));
-        g2d.drawString("0.000.0:", this.getLeft()+85, this.getTop()-20);
+        g2d.drawString("0.000.0:", Game.LEFT+85, Game.TOP-10);
 
         // Desenha na tela os limites do retângulo principal do game
-        g2d.setStroke(new BasicStroke(4f));
-        g2d.drawRect(
-                this.getLeft()-4,
-                this.getTop()-4,
-                this.getWight()+8,
-                this.getHeight()+8
+        g2d.setColor(new Color(31, 133, 4) );
+
+        g2d.fillRect(
+                Game.LEFT,
+                Game.TOP,
+                Game.WIGHT,
+                Game.HEIGHT
         );
+
+        int[][] matrix = new int[Game.HEIGHT/Snake.BODYSIZE][Game.WIGHT/Snake.BODYSIZE];
+
+        for (int l = 0; l < matrix.length; l++) {
+            for (int c = 0; c < matrix[0].length; c++) {
+
+
+                if (l % 2 == 0) {
+                    if (c % 2 == 0) {
+                        g2d.setColor(new Color(27, 117, 5) );
+                    } else {
+                        g2d.setColor(new Color(31, 133, 4) );
+                    }
+                } else {
+                    if (c % 2 == 0) {
+                        g2d.setColor(new Color(31, 133, 4) );
+                    } else {
+                        g2d.setColor(new Color(27, 117, 5) );
+                    }
+                }
+
+
+                g2d.fillRect(
+                        (Game.LEFT + (Snake.BODYSIZE * c)),
+                        (Game.TOP + (Snake.BODYSIZE * l)),
+                        Snake.BODYSIZE,
+                        Snake.BODYSIZE);
+            }
+        }
+
 
         if (this.isGameOver()) {
             if (this.isVisible()) {
-                this.copySnake.draw(g2d);
+                this.snake.draw(g2d);
             }
         } else this.snake.draw(g2d);
 
+        this.food.draw(g2d);
+
     }
 
-    public boolean hasCollision() {
-        int x = this.snake.getBody().getFirst().x;
-        int y = this.snake.getBody().getFirst().y;
-
-        int leftBoundary = this.getLeft();
-        int rightBoundary = this.getWight();
-        int topBoundary = this.getTop();
-        int bottomBoundary = this.getHeight() + this.getTop();
-
-        // Verifica colisão com as extremidades
-        if ((x - Snake.BODYSIZE) > rightBoundary) return true; // Direita
-        if (x < leftBoundary) return true;                     // Esquerda
-        if (y >= bottomBoundary) return true;                  // Abaixo
-        if (y < topBoundary) return true;                      // Acima
-
+    public boolean isFoodEaten() {
+        if (this.snake.getBody().getFirst().intersects(this.food.getBody())) {
+            return true;
+        }
         return false;
     }
 
-    public int getTop() {
-        return top;
+    public boolean hasCollision() {
+        int headX = this.snake.getPositions().getFirst()[0];
+        int headY = this.snake.getPositions().getFirst()[1];
+
+        // Verifica colisão com as extremidades
+        if (headX > Game.WIGHT) return true;                    // Direita
+        if (headX < Game.LEFT) return true;                     // Esquerda
+        if (headY > Game.HEIGHT) return true;                   // Abaixo
+        if (headY < Game.TOP) return true;                      // Acima
+
+        // Nesse for não checamos as 4 primeiras posições, pois é impossível ter uma colisão nessas posições
+        for (int i = 4; i < this.snake.getBody().size(); i++) {
+            System.out.println(this.snake.getBody().get(i));
+
+
+            if (this.snake.getBody().getFirst().intersects(this.snake.getBody().get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int[] randomCoordinatesOfFood() {
+        int x = random.nextInt(((Game.WIGHT / 40) - (Game.LEFT / 40)) + 1) * 40 + Game.LEFT / 40 * 40;
+        int y = random.nextInt(((Game.HEIGHT / 40) - (Game.TOP / 40)) + 1) * 40 + Game.TOP / 40 * 40;
+
+        return new int[]{x, y};
+    }
+
+    public boolean validateFoodPosition(int x, int y) {
+        boolean positionValidate = true;
+
+        for (int i = 0; i < this.snake.getPositions().size(); i++) {
+            if (this.snake.getPositions().get(i)[0] == x && this.snake.getPositions().get(i)[1] == y) {
+                positionValidate = false;
+            }
+        }
+        return positionValidate;
+    }
+
+    public void coordinatesOfFood() {
+
+        while (true) {
+            int[] coordinates = this.randomCoordinatesOfFood();
+            int x = coordinates[0];
+            int y = coordinates[1];
+
+            if (this.validateFoodPosition(x, y)) {
+                this.food.getBody().setLocation(x, y);
+                break;
+            }
+        }
     }
 
     public int getBottom() {
         return bottom;
-    }
-
-    public int getLeft() {
-        return left;
-    }
-
-    public int getWight() {
-        return wight;
-    }
-
-    public int getHeight() {
-        return height;
     }
 
     public int getX() {
@@ -142,5 +241,13 @@ public class Game {
 
     public void setVisible(boolean visible) {
         isVisible = visible;
+    }
+
+    public int getTimerIsMov() {
+        return timerIsMov;
+    }
+
+    public void setTimerIsMov(int timerIsMov) {
+        this.timerIsMov = timerIsMov;
     }
 }

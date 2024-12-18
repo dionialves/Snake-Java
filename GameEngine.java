@@ -5,9 +5,9 @@ import java.awt.event.KeyListener;
 
 
 public class GameEngine extends JPanel implements Runnable, KeyListener {
-    public static final int WIDTH = 300;
-    public static final int HEIGHT = 500;
-    private final int fps = 60;
+    public static final int WIDTH = 640;
+    public static final int HEIGHT = 640;
+    private final int fps = 240;
 
     private final Game game = new Game();
 
@@ -35,7 +35,9 @@ public class GameEngine extends JPanel implements Runnable, KeyListener {
         // e chamo o método dram da classe PainelGame, dentro desse método irei desenhar
         // tudo que a tela irá apresentar.
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.BLACK);
+        //g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        g2d.setColor(new Color(20, 78, 11));
         g2d.fillRect(0, 0, getWidth(), getHeight());
 
         this.game.draw(g2d);
@@ -76,16 +78,16 @@ public class GameEngine extends JPanel implements Runnable, KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            Game.DIRECTION = "RIGHT";
+            Game.direction = "RIGHT";
         }
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            Game.DIRECTION = "LEFT";
+            Game.direction = "LEFT";
         }
         if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            Game.DIRECTION = "DOWN";
+            Game.direction = "DOWN";
         }
         if (e.getKeyCode() == KeyEvent.VK_UP) {
-            Game.DIRECTION = "UP";
+            Game.direction = "UP";
         }
     }
 
