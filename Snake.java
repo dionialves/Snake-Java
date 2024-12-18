@@ -1,25 +1,33 @@
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
+// Classe muito importante que possui os parâmetros da Snake
 public class Snake {
+    // Atributo que define o tamanho do corpo da snake, muito usado em todo o codigo;
     public static final int BODYSIZE = 40;
-    public static final int NEWSIZE = 40;
+    // Lista de retângulos que compreendem a snake
     private final List<Rectangle> body = new ArrayList<>();
-    private String direction;
+    // Lista de posições, uso ela para desenhas e snake e dar uma sensação de suavidade na movimentação da snake
     private final List<int[]> positions = new ArrayList<>();
+    // Direção que a cabeça da Snake está indo
+    private String direction;
 
     public Snake(String direction) {
-        this.getBody().add(new Rectangle(120, 280, Snake.NEWSIZE, Snake.NEWSIZE));
-        this.getBody().add(new Rectangle( Snake.NEWSIZE, Snake.NEWSIZE));
-        this.getBody().add(new Rectangle( Snake.NEWSIZE, Snake.NEWSIZE));
+        // Desenho os 3 primeiras partes da Snake, pode observar que apenas a cabeça tem coordenadas
+        // isso é necessário, pois todas as outras partes seguiram a cabeça.
+        this.getBody().add(new Rectangle(120, 280, Snake.BODYSIZE, Snake.BODYSIZE));
+        this.getBody().add(new Rectangle( Snake.BODYSIZE, Snake.BODYSIZE));
+        this.getBody().add(new Rectangle( Snake.BODYSIZE, Snake.BODYSIZE));
 
+        // Adiciono a coordenada da cabeça na lista de posições
         this.getPositions().addFirst(new int[]{this.getBody().getFirst().x, this.getBody().getFirst().y});
-
+        // Defino a direção inicial da Snake
         this.setDirection(direction);
     }
 
+    // Método para atualizar a logica da Snake, primeiramente movimentando a cabeça, e depois construindo o restante
+    // do corpo
     public void update() {
         // Move cabeça da snake para frente, independente da direção
         this.moveHead();
@@ -27,49 +35,40 @@ public class Snake {
         this.buildSnake();
     }
 
+    // Desenha a Snake na tela
     public void draw(Graphics2D g2d) {
-
         for (int i = 0; i < this.getPositions().size(); i++) {
-
-            int color = (int) (113 - (1+(i*0.05)));
-            if (color < 0) {
-                color = 0;
-            }
             g2d.setColor(new Color(255, 255, 255));
-
-
             g2d.fillRect(
                     this.getPositions().get(i)[0],
                     this.getPositions().get(i)[1],
-                    Snake.NEWSIZE,
-                    Snake.NEWSIZE
+                    Snake.BODYSIZE,
+                    Snake.BODYSIZE
             );
-
-
         }
     }
 
+    // Método responsável por movimentar a cabeça da snake, movimetando um 1 posição no quadro dependendo da direção
+    // escolhida pelo usuário. Caso não seja trocado a direção ela segue em frente, dependendo da direção.
+    // Após a movimentação, adiciona a posição no atributo positions. Pode-se observar que é adicionado a posição no
+    // índice 0. Essa lista de posições também tem um limite, que seria o tamanho de BODYSIZE * o tamanho do corpo da
+    // snake.
     public void moveHead() {
-        int dire = 0;
         switch (this.getDirection()) {
             case "UP":
                 this.getBody().getFirst().y -= 1;
-                dire = 0;
                 break;
             case "RIGHT":
                 this.getBody().getFirst().x += 1;
-                dire = 1;
                 break;
             case "DOWN":
                 this.getBody().getFirst().y += 1;
-                dire = 2;
                 break;
             case "LEFT":
                 this.getBody().getFirst().x -= 1;
-                dire = 3;
                 break;
         }
-        this.getPositions().addFirst(new int[]{this.getBody().getFirst().x, this.getBody().getFirst().y, dire});
+        this.getPositions().addFirst(new int[]{this.getBody().getFirst().x, this.getBody().getFirst().y});
 
         if (this.getPositions().size() > (this.getBody().size() * Snake.BODYSIZE) - Snake.BODYSIZE) {
             this.getPositions().removeLast();
@@ -95,8 +94,8 @@ public class Snake {
         }
     }
 
+    // Nesse método altera a direção da snake, foi construído para não permitir que a snake faça um retorno de 180 graus
     public void changeDirection(String direction) {
-
         switch (direction) {
             case "UP":
                 if (!this.getDirection().equals("DOWN")) {
@@ -121,27 +120,13 @@ public class Snake {
         }
     }
 
+    // Adiciona um novo retângulo ao corpo da snake.
     public void addBody() {
-        this.getBody().add(new Rectangle( Snake.NEWSIZE, Snake.NEWSIZE));
-    }
-
-    public List<Rectangle> cloneBody() {
-        List<Rectangle> copyBody = new ArrayList<>();
-
-        for (Rectangle rect : this.getBody()) {
-            copyBody.add(new Rectangle(rect));
-        }
-
-        return copyBody;
+        this.getBody().add(new Rectangle( Snake.BODYSIZE, Snake.BODYSIZE));
     }
 
     public List<Rectangle> getBody() {
         return body;
-    }
-
-    public void setBody(List<Rectangle> body) {
-        this.body.clear();
-        this.body.addAll(body);
     }
 
     public String getDirection() {

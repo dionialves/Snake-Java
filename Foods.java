@@ -1,14 +1,14 @@
 import java.awt.*;
-import java.util.Random;
 
+// Classe responsável pelo food do game!
 public class Foods {
     private Rectangle body;
     private int size;
 
+    // Método principal da classe que desenha o food na tela.
     public void draw(Graphics2D g2d) {
         g2d.setColor(Color.red);
         g2d.fillOval(this.body.x, this.body.y, this.size, this.size);
-
     }
 
     public Foods() {

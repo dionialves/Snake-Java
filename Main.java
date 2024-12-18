@@ -14,7 +14,6 @@ public class Main {
         window.setVisible(true);
         window.setLocationRelativeTo(null);
 
-        // Adicionando tudo isso a uma Thread
         new Thread(game).start();
     }
 }
