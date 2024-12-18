@@ -6,7 +6,7 @@ public class Foods {
     private int size;
 
     public void draw(Graphics2D g2d) {
-        g2d.setColor(Color.WHITE);
+        g2d.setColor(Color.red);
         g2d.fillOval(this.body.x, this.body.y, this.size, this.size);
 
     }

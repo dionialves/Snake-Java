@@ -81,12 +81,13 @@ public class Game {
     }
 
     public void draw(Graphics2D g2d) {
-        g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Arial", Font.BOLD, 24));
-        g2d.drawString("Score:", Game.LEFT, Game.TOP-10);
 
-        g2d.setFont(new Font("Arial", Font.PLAIN, 16));
-        g2d.drawString("0.000.0:", Game.LEFT+85, Game.TOP-10);
+        g2d.setColor(Color.red);
+        g2d.fillOval( Game.LEFT, Game.TOP-32, 25, 25);
+
+        g2d.setColor(new Color(227, 185, 31));
+        g2d.setFont(new Font("Arial", Font.BOLD, 18));
+        g2d.drawString(Integer.toString(this.snake.getBody().size()-3), Game.LEFT+35, Game.TOP-13);
 
         // Desenha na tela os limites do retângulo principal do game
         g2d.setColor(new Color(31, 133, 4) );
@@ -103,7 +104,6 @@ public class Game {
         for (int l = 0; l < matrix.length; l++) {
             for (int c = 0; c < matrix[0].length; c++) {
 
-
                 if (l % 2 == 0) {
                     if (c % 2 == 0) {
                         g2d.setColor(new Color(27, 117, 5) );
@@ -117,7 +117,6 @@ public class Game {
                         g2d.setColor(new Color(27, 117, 5) );
                     }
                 }
-
 
                 g2d.fillRect(
                         (Game.LEFT + (Snake.BODYSIZE * c)),
