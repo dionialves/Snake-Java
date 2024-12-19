@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 // Classe muito importante que possui os parâmetros da Snake
 public class Snake {
@@ -134,7 +135,10 @@ public class Snake {
     }
 
     public void setDirection(String direction) {
-        this.direction = direction;
+        if (!Objects.equals(this.direction, direction)) {
+            this.direction = direction;
+            SoundManager.playSound("move");
+        }
     }
 
     public List<int[]> getPositions() {

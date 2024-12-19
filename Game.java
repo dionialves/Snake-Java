@@ -23,6 +23,11 @@ public class Game {
         // Inicialização do food com coordenadas randômicas, posteriormente a isso, ele será chamado apenas se a snake
         // comer o food
         this.coordinatesOfFood();
+        // Load sons do game
+        SoundManager.loadSound("bite", "assets/bite.wav");
+        SoundManager.loadSound("levelup", "assets/levelup.wav");
+        SoundManager.loadSound("gameover", "assets/gameover.wav");
+        SoundManager.loadSound("move", "assets/move.wav");
     }
 
     public void update() {
@@ -36,13 +41,18 @@ public class Game {
                 // Caso sim:
                 // Seta game over como true
                 this.setGameOver(true);
+                // emite som de game
+                SoundManager.playSound("gameover");
             }
             // Se snake comeu o food:
-            // 1: Gera uma nova posição para food
-            // 2: Adiciona mais um retângulo a Snake
+            // 1: Adiciona o som de mordida
+            // 2: Gera uma nova posição para food
+            // 3: Adiciona mais um retângulo a Snake
             if (this.isFoodEaten()) {
+                SoundManager.playSound("bite");
                 this.coordinatesOfFood();
                 this.snake.addBody();
+
             }
 
             // Aqui entra a movimentação da Snake, a cada 10 frames do game, entra para a contabilização da contador de
