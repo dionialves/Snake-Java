@@ -1,10 +1,18 @@
 # Snake-Java
 
-Snake-Java é um projeto pensado para explorar todo o potencial do clássico jogo Snake. Não se trata apenas de criar algo pequeno para carregar no GitHub e passar para o próximo desafio. Ao longo do processo de desenvolvimento, pretendo adicionar novos recursos para torná-lo único, mesmo sendo um jogo reconhecido mundialmente.
+Snake-Java é um projeto inspirado no clássico jogo Snake, desenvolvido com o objetivo de explorar e expandir suas possibilidades. Mais do que um simples jogo, este projeto busca agregar funcionalidades únicas e inovadoras, transformando o familiar em algo especial e envolvente.
 
-Por que Java?
-Escolhi Java porque é a linguagem com a qual trabalho atualmente. Este projeto serve como uma oportunidade para solidificar meu entendimento de sua sintaxe e explorar o potencial da linguagem no desenvolvimento de um pequeno jogo. Vamos ver até onde podemos levar este projeto.
+## Por que Java?
 
-<div style="display: flex;">
-    <img src="https://github.com/dionialves/Snake-Java/blob/main/Snake-Java.png" alt="Tetris Image 1" width="500" style="margin-right: 10px;"/>
-</div>
+Java foi escolhido por ser a linguagem em que trabalho atualmente. Este projeto oferece uma oportunidade para consolidar meu conhecimento em Java, explorar sua sintaxe de forma prática e experimentar suas capacidades no desenvolvimento de jogos. Estou animado para ver até onde este projeto pode chegar!
+
+![Snake-Java Preview](https://github.com/dionialves/Snake-Java/blob/main/Snake-Java.png)
+
+## Próximas Implementações
+
+- Adicionar efeitos sonoros para movimentos e colisões;
+- Incluir imagens para a fruta e a cobra no jogo;
+- Implementar um sistema de pontuação com salvamento de recordes;
+- Aumentar a dificuldade ao longo do tempo, acelerando a velocidade da cobra;
+- Criar um modo de partidas rápidas;
+- Desenvolver uma campanha com fases progressivas.
