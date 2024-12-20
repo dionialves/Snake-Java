@@ -51,8 +51,7 @@ public class Game {
             if (this.isFoodEaten()) {
                 SoundManager.playSound("bite");
                 this.coordinatesOfFood();
-                this.snake.addBody();
-
+                this.snake.addBody(this.snake.getPositions().getLast().getDirection());
             }
 
             // Aqui entra a movimentação da Snake, a cada 10 frames do game, entra para a contabilização da contador de
@@ -120,7 +119,7 @@ public class Game {
     // método responsável por avaliar se a snake comeu o food. Usando o método intersects, que verifica se um retànfulo
     // sobrepôs outro!
     public boolean isFoodEaten() {
-        if (this.snake.getBody().getFirst().intersects(this.food.getBody())) {
+        if (this.snake.getBody().getFirst().intersects(this.food.getFoodRectangle())) {
             return true;
         }
         return false;
@@ -130,8 +129,8 @@ public class Game {
     // se a Snake colidiu com ela mesma
     public boolean hasCollision() {
         // Verificação se colidiu com as extremidades
-        int headX = this.snake.getPositions().getFirst()[0];
-        int headY = this.snake.getPositions().getFirst()[1];
+        int headX = this.snake.getPositions().getFirst().getX();
+        int headY = this.snake.getPositions().getFirst().getY();
 
         if (headX > Game.WIGHT) return true;                    // Direita
         if (headX < Game.LEFT) return true;                     // Esquerda
@@ -163,7 +162,7 @@ public class Game {
         boolean positionValidate = true;
 
         for (int i = 0; i < this.snake.getPositions().size(); i++) {
-            if (this.snake.getPositions().get(i)[0] == x && this.snake.getPositions().get(i)[1] == y) {
+            if (this.snake.getPositions().get(i).getX() == x && this.snake.getPositions().get(i).getY() == y) {
                 positionValidate = false;
             }
         }
@@ -183,7 +182,7 @@ public class Game {
             // Se entrar nessa condição, significa que se encontrou uma posição valida, então seta a nova posição no
             // food e sai do loop;
             if (this.validateFoodPosition(x, y)) {
-                this.food.getBody().setLocation(x, y);
+                this.food.getFoodRectangle().setLocation(x, y);
                 break;
             }
         }

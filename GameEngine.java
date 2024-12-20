@@ -7,7 +7,7 @@ import java.awt.event.KeyListener;
 public class GameEngine extends JPanel implements Runnable, KeyListener {
     public static final int WIDTH = 640;
     public static final int HEIGHT = 640;
-    private final int fps = 240;
+    private final int fps = 30;
 
     private final Game game = new Game();
 
