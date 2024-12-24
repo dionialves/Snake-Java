@@ -6,7 +6,7 @@ Snake-Java é um projeto inspirado no clássico jogo Snake, desenvolvido com o o
 
 Java foi escolhido por ser a linguagem em que trabalho atualmente. Este projeto oferece uma oportunidade para consolidar meu conhecimento em Java, explorar sua sintaxe de forma prática e experimentar suas capacidades no desenvolvimento de jogos. Estou animado para ver até onde este projeto pode chegar!
 
-![Snake-Java Preview](https://github.com/dionialves/Snake-Java/blob/main/assets/Snake-Java.png)
+![Snake-Java Preview](https://github.com/dionialves/Snake-Java/blob/main/src/main/resources/images/Snake-Java.png)
 
 ## Próximas Implementações
 
