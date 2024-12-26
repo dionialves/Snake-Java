@@ -2,36 +2,36 @@ package main.java.com.dionialves.snakeJava;
 
 import main.java.com.dionialves.snakeJava.entities.Foods;
 import main.java.com.dionialves.snakeJava.entities.Snake;
+import main.java.com.dionialves.snakeJava.entities.SnakeSegment;
 import main.java.com.dionialves.snakeJava.entities.SoundManager;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Game {
     // Atributos de controle do game
-    public static final int WIGHT = 560;
-    public static final int HEIGHT = 560;
-    public static final int TOP = 40;
-    public static final int LEFT = 40;
-    private int cellSize = 40;
+    public static final int WIGHT = 595;
+    public static final int HEIGHT = 525;
+    public static final int TOP = 105;
+    public static final int LEFT = 35;
+    public static final int CELLSIZE = 35;
 
     private boolean gameOver = false;
     public static String direction = "RIGHT";
     private final Random random = new Random();
 
-    private int timerIsMov = 0;
+    private int timer = 0;
 
     // Instancia das classes pertencentes ao projeto
     private final Snake snake = new Snake(direction);
-    private final Foods food = new Foods(this.getCellSize());
+    private final Foods food = new Foods(Game.CELLSIZE);
 
     public Game() {
         // Inicialização do food com coordenadas randômicas, posteriormente a isso, ele será chamado apenas se a snake
         // comer o food
         this.coordinatesOfFood();
-
-        // Inicialização dos atributos
-
 
         // Load sons do game
         SoundManager.loadSound("bite", "src/main/resources/sounds/bite.wav");
@@ -41,9 +41,12 @@ public class Game {
     }
 
     public void update() {
+
         if (!this.isGameOver()) {
-            // Atualiza as posições da main.java.com.dionialves.snakeJava.entities.Snake
-            this.snake.update();
+
+            this.setTimer(this.getTimer() + 1);
+            this.snake.moveVisualSnake();
+
             // Verifica se existe alguma colisão
             if (this.hasCollision()) {
                 // Caso sim:
@@ -52,6 +55,7 @@ public class Game {
                 // emite som de game
                 SoundManager.playSound("gameover");
             }
+
             // Se snake comeu o food:
             // 1: Adiciona o som de mordida
             // 2: Gera uma nova posição para food
@@ -59,87 +63,100 @@ public class Game {
             if (this.isFoodEaten()) {
                 SoundManager.playSound("bite");
                 this.coordinatesOfFood();
-                this.snake.addBody();
-
+                this.snake.addSegment();
             }
 
-            double x = this.snake.getPositions().getFirst().getX();
-            double y = this.snake.getPositions().getFirst().getY();
 
-            if (x % this.getCellSize() == 0 && y % this.getCellSize() == 0) {
-                this.snake.changeDirection(Game.direction);
+            if (this.getTimer() % 7 == 0) {
+                // Atualiza as posições da main.java.com.dionialves.snakeJava.entities.Snake
+                this.snake.update();
+
+                int x = (int) this.snake.getLogicalSegments().getFirst().getX();
+                int y = (int) this.snake.getLogicalSegments().getFirst().getY();
+                System.out.println("X: " + x + " Y: " + y);
+                if (x % Game.CELLSIZE == 0 && y % Game.CELLSIZE == 0) {
+                    this.snake.changeDirection(Game.direction);
+
+                }
             }
+
+
 
         }
     }
 
     public void draw(Graphics2D g2d) {
+        // Retângulo superior
+
+
+
         // Desenho do food no top da pagina, como imagem contador dos pontos
         g2d.setColor(Color.red);
         g2d.fillOval( Game.LEFT, Game.TOP-32, 25, 25);
+
 
         // Desenha os pontos obtidos no game, cada food que a snake comer será um ponto
         g2d.setColor(new Color(227, 185, 31));
         g2d.setFont(new Font("Arial", Font.BOLD, 18));
         // Para definição do ponto eu pego o tamanho da main.java.com.dionialves.snakeJava.entities.Snake e diminuo 3, que são as posições iniciais
-        g2d.drawString(Integer.toString(this.snake.getBody().size()-3), Game.LEFT+35, Game.TOP-13);
+        g2d.drawString(Integer.toString(this.snake.getLogicalSegments().size()-3), Game.LEFT+35, Game.TOP-13);
 
-        // Define uma matrix para desenhar o quadrante do game, com tamanho de cada posição o valor de cellSize
-        int[][] matrix = new int[Game.HEIGHT/ this.getCellSize()][Game.WIGHT/ this.getCellSize()];
+        // Define uma matrix para desenhar o quadrante do game, com tamanho de cada posição o valor de CELLSIZE
+        int[][] matrix = new int[Game.HEIGHT/ Game.CELLSIZE][Game.WIGHT/ Game.CELLSIZE];
         // Loop para desenhar esse quatro, que ficará em formato xadrez!
         for (int l = 0; l < matrix.length; l++) {
             for (int c = 0; c < matrix[0].length; c++) {
                 if (l % 2 == 0) {
                     if (c % 2 == 0) {
-                        g2d.setColor(new Color(27, 117, 5) );
+                        g2d.setColor(new Color(161, 208, 73) );
                     } else {
-                        g2d.setColor(new Color(31, 133, 4) );
+                        g2d.setColor(new Color(169, 214, 81) );
                     }
                 } else {
                     if (c % 2 == 0) {
-                        g2d.setColor(new Color(31, 133, 4) );
+                        g2d.setColor(new Color(169, 214, 81) );
                     } else {
-                        g2d.setColor(new Color(27, 117, 5) );
+                        g2d.setColor(new Color(161, 208, 73) );
                     }
                 }
                 g2d.fillRect(
-                        (Game.LEFT + (this.getCellSize() * c)),
-                        (Game.TOP + (this.getCellSize() * l)),
-                        this.getCellSize(),
-                        this.getCellSize());
+                        (Game.LEFT + (Game.CELLSIZE * c)),
+                        (Game.TOP + (Game.CELLSIZE * l)),
+                        Game.CELLSIZE,
+                        Game.CELLSIZE);
             }
         }
-        // Desenha a main.java.com.dionialves.snakeJava.entities.Snake
-        this.snake.draw(g2d);
         // Desenha o Food
         this.food.draw(g2d);
+        // Desenha a main.java.com.dionialves.snakeJava.entities.Snake
+        this.snake.draw(g2d);
+
+
     }
+
 
     // método responsável por avaliar se a snake comeu o food. Usando o método intersects, que verifica se um retànfulo
     // sobrepôs outro!
     public boolean isFoodEaten() {
-        if (this.snake.getBody().getFirst().intersects(this.food.getBody())) {
-            return true;
-        }
-        return false;
+        return this.snake.getVisualSegments().getFirst().intersects(this.food.getBody());
     }
 
     // Método responsável por verificar se ouve uma colisão, ele verificas as colições nos limites do quadro e também
     // se a main.java.com.dionialves.snakeJava.entities.Snake colidiu com ela mesma
     public boolean hasCollision() {
         // Verificação se colidiu com as extremidades
-        double headX = this.snake.getPositions().getFirst().getX();
-        double headY = this.snake.getPositions().getFirst().getY();
+        double headX = this.snake.getVisualSegments().getFirst().getX();
+        double headY = this.snake.getVisualSegments().getFirst().getY();
 
         if (headX > Game.WIGHT) return true;                    // Direita
         if (headX < Game.LEFT) return true;                     // Esquerda
-        if (headY > Game.HEIGHT) return true;                   // Abaixo
+        if (headY > Game.HEIGHT + Game.CELLSIZE *2) return true;                   // Abaixo
         if (headY < Game.TOP) return true;                      // Acima
 
         // Verificação se a snake colidiu com ela mesma
         // Nesse for não checamos as 4 primeiras posições, pois é impossível ter uma colisão nessas posições
-        for (int i = 4; i < this.snake.getBody().size(); i++) {
-            if (this.snake.getBody().getFirst().intersects(this.snake.getBody().get(i))) {
+        for (int i = 4; i < this.snake.getLogicalSegments().size(); i++) {
+            if (this.snake.getLogicalSegments().getFirst().intersects(this.snake.getLogicalSegments().get(i))) {
                 return true;
             }
         }
@@ -149,8 +166,8 @@ public class Game {
     // Gera posições randômicas, dentro do quadro do game, mas usando uma logica para gerar certas de 40 em 40, para
     // ficar dentro de cada posição da matrix.
     public int[] randomCoordinatesOfFood() {
-        int x = random.nextInt(((Game.WIGHT / 40) - (Game.LEFT / 40)) + 1) * 40 + Game.LEFT / 40 * 40;
-        int y = random.nextInt(((Game.HEIGHT / 40) - (Game.TOP / 40)) + 1) * 40 + Game.TOP / 40 * 40;
+        int x = random.nextInt(((Game.WIGHT / 35) - (Game.LEFT / 35)) + 1) * 35 + Game.LEFT / 35 * 35;
+        int y = random.nextInt(((Game.HEIGHT / 35) - (Game.TOP / 35)) + 1) * 35 + Game.TOP / 35 * 35;
 
         return new int[]{x, y};
     }
@@ -160,8 +177,8 @@ public class Game {
     public boolean validateFoodPosition(int x, int y) {
         boolean positionValidate = true;
 
-        for (int i = 0; i < this.snake.getPositions().size(); i++) {
-            if (this.snake.getPositions().get(i).getX() == x && this.snake.getPositions().get(i).getY() == y) {
+        for (int i = 0; i < this.snake.getLogicalSegments().size(); i++) {
+            if (this.snake.getLogicalSegments().get(i).getX() == x && this.snake.getLogicalSegments().get(i).getY() == y) {
                 positionValidate = false;
             }
         }
@@ -195,19 +212,11 @@ public class Game {
         this.gameOver = gameOver;
     }
 
-    public int getTimerIsMov() {
-        return timerIsMov;
+    public int getTimer() {
+        return timer;
     }
 
-    public void setTimerIsMov(int timerIsMov) {
-        this.timerIsMov = timerIsMov;
-    }
-
-    public int getCellSize() {
-        return cellSize;
-    }
-
-    public void setCellSize(int cellSize) {
-        this.cellSize = cellSize;
+    public void setTimer(int timer) {
+        this.timer = timer;
     }
 }

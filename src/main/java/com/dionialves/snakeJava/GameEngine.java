@@ -7,9 +7,9 @@ import java.awt.event.KeyListener;
 
 
 public class GameEngine extends JPanel implements Runnable, KeyListener {
-    public static final int WIDTH = 640;
-    public static final int HEIGHT = 640;
-    private final int fps = 240;
+    public static final int WIDTH = 665;
+    public static final int HEIGHT = 660;
+    private final int fps = 40;
 
     private final Game game = new Game();
 
@@ -37,10 +37,12 @@ public class GameEngine extends JPanel implements Runnable, KeyListener {
         // e chamo o método dram da classe PainelGame, dentro desse método irei desenhar
         // tudo que a tela irá apresentar.
         Graphics2D g2d = (Graphics2D) g;
-        //g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g2d.setColor(new Color(20, 78, 11));
+        g2d.setColor(new Color(87, 137, 52));
         g2d.fillRect(0, 0, getWidth(), getHeight());
+
+        g2d.setColor(new Color(74, 116, 44));
+        g2d.fillRect(0, 0, getWidth(), 70);
 
         this.game.draw(g2d);
     }
