@@ -1,6 +1,6 @@
 # Snake-Java
 
-Snake-Java é um projeto inspirado no clássico jogo Snake, desenvolvido com o objetivo de explorar e expandir suas possibilidades. Mais do que um simples jogo, este projeto busca agregar funcionalidades únicas e inovadoras, transformando o familiar em algo especial e envolvente.
+Snake-Java é um projeto inspirado no clássico jogo Snake, desenvolvido com o objetivo de explorar e expandir suas possibilidades. Mais do que um simples jogo, este projeto busca agregar funcionalidades únicas e inovadoras, transformando o familiar em algo especial e envolvente. Utilizarei como designer inicial as mesma sprites do Google Games Snake, focando inicialmente nas no desenvolvimento das funcionalidades e deixando o designer do game para um futuro.
 
 ## Por que Java?
 
