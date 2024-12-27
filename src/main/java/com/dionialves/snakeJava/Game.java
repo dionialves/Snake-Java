@@ -2,13 +2,25 @@ package main.java.com.dionialves.snakeJava;
 
 import main.java.com.dionialves.snakeJava.entities.Foods;
 import main.java.com.dionialves.snakeJava.entities.Snake;
-import main.java.com.dionialves.snakeJava.entities.SnakeSegment;
 import main.java.com.dionialves.snakeJava.entities.SoundManager;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
+
+// Ajustes que devem ser feitos:
+
+// Bugs
+// 1: Ajustar a logica de colisão dos limites;
+// 2: Ajustar a logica de colisão na própria snake
+// 3: Ao adicionar um novo segmento, a direção desse novo segmento não segue a snake, causando um efeito visual não desejado
+// 4: Melhorar a logica de sombreamento da snake
+// 5: Ajustar o aumento do food, pois quando ele aumenta, continua tendo como referência o mesmo x e y, com isso
+//    o aumento parte de um ponto, gostaria que aumentasse em todos os sentidos.
+
+// Implementações
+// 1: Desenhar uma cabeça para a snake
+// 2: Ajustar o topo do game
+// 3: Adicionar imagem do food
 
 public class Game {
     // Atributos de controle do game
@@ -26,7 +38,7 @@ public class Game {
 
     // Instancia das classes pertencentes ao projeto
     private final Snake snake = new Snake(direction);
-    private final Foods food = new Foods(Game.CELLSIZE);
+    private final Foods food = new Foods();
 
     public Game() {
         // Inicialização do food com coordenadas randômicas, posteriormente a isso, ele será chamado apenas se a snake
@@ -45,16 +57,7 @@ public class Game {
         if (!this.isGameOver()) {
 
             this.setTimer(this.getTimer() + 1);
-            this.snake.moveVisualSnake();
 
-            // Verifica se existe alguma colisão
-            if (this.hasCollision()) {
-                // Caso sim:
-                // Seta game over como true
-                this.setGameOver(true);
-                // emite som de game
-                SoundManager.playSound("gameover");
-            }
 
             // Se snake comeu o food:
             // 1: Adiciona o som de mordida
@@ -66,18 +69,28 @@ public class Game {
                 this.snake.addSegment();
             }
 
-
             if (this.getTimer() % 7 == 0) {
                 // Atualiza as posições da main.java.com.dionialves.snakeJava.entities.Snake
                 this.snake.update();
 
                 int x = (int) this.snake.getLogicalSegments().getFirst().getX();
                 int y = (int) this.snake.getLogicalSegments().getFirst().getY();
-                System.out.println("X: " + x + " Y: " + y);
+
                 if (x % Game.CELLSIZE == 0 && y % Game.CELLSIZE == 0) {
                     this.snake.changeDirection(Game.direction);
 
                 }
+            }
+
+            this.snake.moveVisualSnake();
+
+            // Verifica se existe alguma colisão
+            if (this.hasCollision()) {
+                // Caso sim:
+                // Seta game over como true
+                this.setGameOver(true);
+                // emite som de game
+                SoundManager.playSound("gameover");
             }
 
 
@@ -86,9 +99,6 @@ public class Game {
     }
 
     public void draw(Graphics2D g2d) {
-        // Retângulo superior
-
-
 
         // Desenho do food no top da pagina, como imagem contador dos pontos
         g2d.setColor(Color.red);
@@ -126,14 +136,14 @@ public class Game {
                         Game.CELLSIZE);
             }
         }
-        // Desenha o Food
-        this.food.draw(g2d);
+
         // Desenha a main.java.com.dionialves.snakeJava.entities.Snake
         this.snake.draw(g2d);
+        // Desenha o Food
+        this.food.draw(g2d);
 
 
     }
-
 
     // método responsável por avaliar se a snake comeu o food. Usando o método intersects, que verifica se um retànfulo
     // sobrepôs outro!
@@ -150,7 +160,7 @@ public class Game {
 
         if (headX > Game.WIGHT) return true;                    // Direita
         if (headX < Game.LEFT) return true;                     // Esquerda
-        if (headY > Game.HEIGHT + Game.CELLSIZE *2) return true;                   // Abaixo
+        if (headY > Game.HEIGHT + Game.CELLSIZE * 2 ) return true;                   // Abaixo
         if (headY < Game.TOP) return true;                      // Acima
 
         // Verificação se a snake colidiu com ela mesma

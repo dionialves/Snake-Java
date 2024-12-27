@@ -3,7 +3,9 @@ package main.java.com.dionialves.snakeJava.entities;
 import main.java.com.dionialves.snakeJava.Game;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,20 +52,40 @@ public class Snake {
     public void draw(Graphics2D g2d) {
 
         // Depois desenha a snake visual
-        this.drawSnake(g2d, this.getVisualSegments(), this.getVisualSegments().size());
+        this.drawSnake(g2d, this.getVisualSegments(), this.getVisualSegments().size(), true);
         // Desenha primeiramente a snake logica
-        this.drawSnake(g2d, this.getLogicalSegments(), this.getLogicalSegments().size()-1);
+        this.drawSnake(g2d, this.getLogicalSegments(), this.getLogicalSegments().size()-1, false);
     }
 
-    private void drawSnake(Graphics2D g2d, List<SnakeSegment> snakeSegment, int size) {
+    private void drawSnake(Graphics2D g2d, List<SnakeSegment> snakeSegment, int size, boolean isShadow) {
+        List<String> directions = Arrays.asList("LEFT", "RIGHT");
         int r = 78;
         int g = 123;
         int b = 244;
 
         for (int i = 0; i < size; i++) {
 
-            g2d.setColor(new Color(r, g, b));
+            // Aqui é uma tentativa de melhorar a logica do sombreamento, impedindo que o segmento 1 (no caso ao segundo)
+            // aparece a sombra quando ele estiver descendo.
+            // preciso melhorar e muito essa logica
+            if (isShadow && !(i == 1 && snakeSegment.get(i).getDirection().equals("DOWN"))) {
 
+                BufferedImage ShadowSegment = ShadowGenerator.addShadowToRectangle(
+                        this.getBodySizeWight(),
+                        this.getBodySizeHeight(),
+                        0,
+                        5,
+                        new Color(0, 0, 0, 30)
+                );
+
+                g2d.drawImage(
+                        ShadowSegment,
+                        (int) snakeSegment.get(i).getX(),
+                        (int) snakeSegment.get(i).getY(),
+                        null);
+            }
+
+            g2d.setColor(new Color(r, g, b));
             // Desenho do segmento
             g2d.fillRect(
                     (int) snakeSegment.get(i).getX(),
@@ -72,13 +94,13 @@ public class Snake {
                     this.getBodySizeHeight()
             );
 
-
             r -= 6;
             g -= 6;
             b -= 9;
             r = Math.max(0, Math.min(255, r));
             g = Math.max(0, Math.min(255, g));
             b = Math.max(0, Math.min(255, b));
+
         }
     }
 
@@ -199,10 +221,9 @@ public class Snake {
     public void addSegment() {
         int x = (int) this.getLogicalSegments().getLast().getX();
         int y = (int) this.getLogicalSegments().getLast().getY();
-        String direction = this.getLogicalSegments().getLast().getDirection();
 
-        this.getLogicalSegments().add(new SnakeSegment(x, y, direction));
-        this.getVisualSegments().add(new SnakeSegment(x, y, direction));
+        this.getLogicalSegments().addLast(new SnakeSegment(x, y, ""));
+        this.getVisualSegments().addLast(new SnakeSegment(x, y, ""));
     }
 
     public String getDirection() {
