@@ -44,15 +44,13 @@ public class Snake {
         this.moveHead();
         // Seta as coordenadas da snake nos retângulos, isso é importando para a logica da verificação de colisões
         this.updateVisualSegments();
-
-
     }
 
     // Desenha a main.java.com.dionialves.snakeJava.entities.Snake na tela
     public void draw(Graphics2D g2d) {
 
         // Depois desenha a snake visual
-        this.drawSnake(g2d, this.getVisualSegments(), this.getVisualSegments().size(), true);
+        this.drawSnake(g2d, this.getVisualSegments(), this.getVisualSegments().size(), false);
         // Desenha primeiramente a snake logica
         this.drawSnake(g2d, this.getLogicalSegments(), this.getLogicalSegments().size()-1, false);
     }
@@ -68,7 +66,7 @@ public class Snake {
             // Aqui é uma tentativa de melhorar a logica do sombreamento, impedindo que o segmento 1 (no caso ao segundo)
             // aparece a sombra quando ele estiver descendo.
             // preciso melhorar e muito essa logica
-            if (isShadow && !(i == 1 && snakeSegment.get(i).getDirection().equals("DOWN"))) {
+            if (isShadow) {
 
                 BufferedImage ShadowSegment = ShadowGenerator.addShadowToRectangle(
                         this.getBodySizeWight(),

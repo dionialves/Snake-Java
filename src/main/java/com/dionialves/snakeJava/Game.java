@@ -16,6 +16,7 @@ import java.util.Random;
 // 4: Melhorar a logica de sombreamento da snake
 // 5: Ajustar o aumento do food, pois quando ele aumenta, continua tendo como referência o mesmo x e y, com isso
 //    o aumento parte de um ponto, gostaria que aumentasse em todos os sentidos.
+// 6: Quando existe um movimento repetitivo e rápido o som não sai direito
 
 // Implementações
 // 1: Desenhar uma cabeça para a snake
@@ -38,7 +39,7 @@ public class Game {
 
     // Instancia das classes pertencentes ao projeto
     private final Snake snake = new Snake(direction);
-    private final Foods food = new Foods();
+    private final Foods food = new Foods(true, true, Game.CELLSIZE);
 
     public Game() {
         // Inicialização do food com coordenadas randômicas, posteriormente a isso, ele será chamado apenas se a snake
@@ -100,16 +101,7 @@ public class Game {
 
     public void draw(Graphics2D g2d) {
 
-        // Desenho do food no top da pagina, como imagem contador dos pontos
-        g2d.setColor(Color.red);
-        g2d.fillOval( Game.LEFT, Game.TOP-32, 25, 25);
 
-
-        // Desenha os pontos obtidos no game, cada food que a snake comer será um ponto
-        g2d.setColor(new Color(227, 185, 31));
-        g2d.setFont(new Font("Arial", Font.BOLD, 18));
-        // Para definição do ponto eu pego o tamanho da main.java.com.dionialves.snakeJava.entities.Snake e diminuo 3, que são as posições iniciais
-        g2d.drawString(Integer.toString(this.snake.getLogicalSegments().size()-3), Game.LEFT+35, Game.TOP-13);
 
         // Define uma matrix para desenhar o quadrante do game, com tamanho de cada posição o valor de CELLSIZE
         int[][] matrix = new int[Game.HEIGHT/ Game.CELLSIZE][Game.WIGHT/ Game.CELLSIZE];
@@ -212,6 +204,10 @@ public class Game {
                 break;
             }
         }
+    }
+
+    public Snake getSnake() {
+        return this.snake;
     }
 
     public boolean isGameOver() {

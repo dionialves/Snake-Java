@@ -1,5 +1,7 @@
 package main.java.com.dionialves.snakeJava;
 
+import main.java.com.dionialves.snakeJava.entities.Foods;
+
 import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -12,6 +14,7 @@ public class GameEngine extends JPanel implements Runnable, KeyListener {
     private final int fps = 40;
 
     private final Game game = new Game();
+    private final Foods food = new Foods(false, false, 35);
 
     public GameEngine() {
         this.addKeyListener(this);
@@ -43,6 +46,21 @@ public class GameEngine extends JPanel implements Runnable, KeyListener {
 
         g2d.setColor(new Color(74, 116, 44));
         g2d.fillRect(0, 0, getWidth(), 70);
+
+        // Desenho do food no top da pagina, como imagem contador dos pontos
+        this.getFood().getBody().setLocation(35, 15);
+        this.getFood().draw(g2d);
+
+
+        // Desenha os pontos obtidos no game, cada food que a snake comer será um ponto
+        g2d.setColor(new Color(255,255,255));
+        g2d.setFont(new Font("Arial", Font.BOLD, 18));
+        // Para definição do ponto eu pego o tamanho da Snake e diminuo 3, que são as posições iniciais
+        g2d.drawString(Integer.toString(
+                this.game.getSnake().getLogicalSegments().size()-3),
+                80,
+                42
+        );
 
         this.game.draw(g2d);
     }
@@ -97,4 +115,8 @@ public class GameEngine extends JPanel implements Runnable, KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {}
+
+    public Foods getFood() {
+        return food;
+    }
 }

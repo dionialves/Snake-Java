@@ -12,18 +12,25 @@ import java.io.File;
 public class Foods {
     private Rectangle body;
     private int normalSize;
-    private int enlargedSize = Game.CELLSIZE + 4;
+    private int enlargedSize;
     private int currentSize;
+
+    private boolean isNormalSize = true;
+    private boolean isAnimation = false;
+    private boolean isShadow;
     private BufferedImage spriteSheet;
     private BufferedImage food;
     private BufferedImage shadowFood;
-    private boolean isNormalSize = true;
 
-    public Foods() {
+
+    public Foods(boolean isAnimation, boolean isShadow, int size) {
         // Inicializações
-        this.setNormalSize(Game.CELLSIZE);
-        this.setEnlargedSize(Game.CELLSIZE + 4);
-        this.setCurrentSize(Game.CELLSIZE);
+        this.setNormalSize(size);
+        this.setEnlargedSize(size + 4);
+        this.setCurrentSize(size);
+
+        this.setAnimation(isAnimation);
+        this.setShadow(isShadow);
 
         this.setBody(new Rectangle(this.getNormalSize(), this.getNormalSize()));
 
@@ -33,7 +40,7 @@ public class Foods {
             e.printStackTrace();
         }
 
-        this.setFood(this.getSprite(33, 145, 110, 142));
+        this.setFood(this.getSprite(18, 146, 140, 140));
         this.setShadowFood(
                 ShadowGenerator.addShadowToImage(this.getFood(),
                         0,
@@ -41,8 +48,10 @@ public class Foods {
                         new Color(0,0,0, 30))
         );
 
-        Timer timer = new Timer(1000, e -> toggleSize());
-        timer.start();
+        if (this.isAnimation) {
+            Timer timer = new Timer(1000, e -> toggleSize());
+            timer.start();
+        }
     }
 
     // Método principal da classe que desenha o food na tela.
@@ -51,7 +60,7 @@ public class Foods {
         int x = this.getBody().x;
         int y = this.getBody().y;
         int width = this.getCurrentSize();
-        int height = this.getCurrentSize() + 11;
+        int height = this.getCurrentSize();
 
         if (!isNormalSize) {
             x -= 2;
@@ -60,20 +69,21 @@ public class Foods {
         } else {
             this.setCurrentSize(this.getNormalSize());
         }
-
-        g2d.drawImage(
-                this.getShadowFood(),
-                x,
-                y,
-                width,
-                height,
-                null
-        );
+        if (this.isShadow()) {
+            g2d.drawImage(
+                    this.getShadowFood(),
+                    x,
+                    y+5,
+                    width,
+                    height,
+                    null
+            );
+        }
         g2d.drawImage(
                 this.getFood(),
                 x,
-                y-5,
-                this.getCurrentSize(),
+                y,
+                width,
                 height,
                 null
         );
@@ -108,7 +118,8 @@ public class Foods {
     private void toggleSize() {
         this.setNormalSize(!this.isNormalSize());
 
-        currentSize = this.isNormalSize() ? this.getNormalSize() : this.getEnlargedSize();
+        // Faz a alteração do currentSize
+        this.setCurrentSize(this.isNormalSize() ? this.getNormalSize() : this.getEnlargedSize());
     }
 
     public Rectangle getBody() {
@@ -173,5 +184,21 @@ public class Foods {
 
     public void setEnlargedSize(int enlargedSize) {
         this.enlargedSize = enlargedSize;
+    }
+
+    public boolean isAnimation() {
+        return isAnimation;
+    }
+
+    public void setAnimation(boolean animation) {
+        isAnimation = animation;
+    }
+
+    public boolean isShadow() {
+        return isShadow;
+    }
+
+    public void setShadow(boolean shadow) {
+        isShadow = shadow;
     }
 }
