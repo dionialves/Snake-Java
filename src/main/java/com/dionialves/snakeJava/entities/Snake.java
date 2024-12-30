@@ -106,6 +106,7 @@ public class Snake {
         for (int i = 0; i < this.getVisualSegments().size(); i ++) {
             SnakeSegment currentSegment = this.getVisualSegments().get(i);
             String direction;
+            int speed = 1;
 
             int x = (int) currentSegment.getX();
             int y = (int) currentSegment.getY();
@@ -119,16 +120,16 @@ public class Snake {
 
             switch (direction) {
                 case "UP":
-                    currentSegment.setY(y-5);
+                    currentSegment.setY(y-speed);
                     break;
                 case "RIGHT":
-                    currentSegment.setX(x+5);
+                    currentSegment.setX(x+speed);
                     break;
                 case "DOWN":
-                    currentSegment.setY(y+5);
+                    currentSegment.setY(y+speed);
                     break;
                 case "LEFT":
-                    currentSegment.setX(x-5 );
+                    currentSegment.setX(x-speed);
                     break;
             }
         }
@@ -172,10 +173,6 @@ public class Snake {
                 this.getLogicalSegments().getFirst().setX(x-35);
                 break;
         }
-
-
-
-
     }
 
     public void updateVisualSegments() {
@@ -219,9 +216,10 @@ public class Snake {
     public void addSegment() {
         int x = (int) this.getLogicalSegments().getLast().getX();
         int y = (int) this.getLogicalSegments().getLast().getY();
+        String direction = this.getLogicalSegments().getLast().getDirection();
 
-        this.getLogicalSegments().addLast(new SnakeSegment(x, y, ""));
-        this.getVisualSegments().addLast(new SnakeSegment(x, y, ""));
+        this.getLogicalSegments().addLast(new SnakeSegment(x, y, direction));
+        this.getVisualSegments().addLast(new SnakeSegment(x, y, direction));
     }
 
     public String getDirection() {

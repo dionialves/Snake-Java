@@ -5,7 +5,10 @@ import main.java.com.dionialves.snakeJava.entities.Snake;
 import main.java.com.dionialves.snakeJava.entities.SoundManager;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Random;
+import java.util.List;
 
 // Ajustes que devem ser feitos:
 
@@ -32,23 +35,31 @@ public class Game {
     public static final int CELLSIZE = 35;
 
     private boolean gameOver = false;
-    public static String direction = "RIGHT";
+    // Coloquei uma lista de direções pois
+    private List<String> listDirection = new ArrayList<>();
     private final Random random = new Random();
 
     private int timer = 0;
 
     // Instancia das classes pertencentes ao projeto
-    private final Snake snake = new Snake(direction);
+    private final Snake snake;
     private final Foods food = new Foods(true, true, Game.CELLSIZE);
 
     public Game() {
+        // inicialização da snake
+        this.snake = new Snake("RIGHT");
+
         // Inicialização do food com coordenadas randômicas, posteriormente a isso, ele será chamado apenas se a snake
         // comer o food
         this.coordinatesOfFood();
 
+        // inicialização da direção
+        this.getListDirection().addFirst("RIGHT");
+
+
+
         // Load sons do game
         SoundManager.loadSound("bite", "src/main/resources/sounds/bite.wav");
-        SoundManager.loadSound("levelup", "src/main/resources/sounds/levelup.wav");
         SoundManager.loadSound("gameover", "src/main/resources/sounds/gameover.wav");
         SoundManager.loadSound("move", "src/main/resources/sounds/move.wav");
     }
@@ -70,7 +81,7 @@ public class Game {
                 this.snake.addSegment();
             }
 
-            if (this.getTimer() % 7 == 0) {
+            if (this.getTimer() % 35 == 0) {
                 // Atualiza as posições da main.java.com.dionialves.snakeJava.entities.Snake
                 this.snake.update();
 
@@ -78,7 +89,11 @@ public class Game {
                 int y = (int) this.snake.getLogicalSegments().getFirst().getY();
 
                 if (x % Game.CELLSIZE == 0 && y % Game.CELLSIZE == 0) {
-                    this.snake.changeDirection(Game.direction);
+                    System.out.println(this.getListDirection());
+                    if (!this.getListDirection().isEmpty()) {
+                        this.snake.changeDirection(this.getListDirection().getFirst());
+                        this.getListDirection().removeFirst();
+                    }
 
                 }
             }
@@ -203,6 +218,31 @@ public class Game {
                 this.food.getBody().setLocation(x, y);
                 break;
             }
+        }
+    }
+    public List<String> getListDirection(){
+        return this.listDirection;
+    }
+
+    public void addNewDirection(String newDirection) {
+        // Validar nova entrada com os seguintes parâmetros
+        // 1= A lista não pode ter um tamanho de mais de 3 posições
+        // 2= Não pode ter uma sequência de posições iguais
+
+        // Se não estiver fazia, entra no bloco
+        if (!this.getListDirection().isEmpty()) {
+            // Se tiver no máximo duas posições
+            if (this.getListDirection().size() <= 2) {
+                // Verifica se a última posição é diferente da que estamos tentando adicionar, caso for diferente
+                // adiciona
+                String lastDirection = this.getListDirection().getLast();
+                if (!Objects.equals(lastDirection, newDirection)) {
+                    this.getListDirection().addLast(newDirection);
+                }
+            }
+        } else {
+            // Caso lista esteja vazia adiciona um item a lista
+            this.getListDirection().addFirst(newDirection);
         }
     }
 

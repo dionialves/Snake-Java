@@ -6,12 +6,12 @@ import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-
+import java.util.Objects;
 
 public class GameEngine extends JPanel implements Runnable, KeyListener {
     public static final int WIDTH = 665;
     public static final int HEIGHT = 660;
-    private final int fps = 40;
+    private final int fps = 180;
 
     private final Game game = new Game();
     private final Foods food = new Foods(false, false, 35);
@@ -100,16 +100,16 @@ public class GameEngine extends JPanel implements Runnable, KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            Game.direction = "RIGHT";
+            this.game.addNewDirection("RIGHT");
         }
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            Game.direction = "LEFT";
+            this.game.addNewDirection("LEFT");
         }
         if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            Game.direction = "DOWN";
+            this.game.addNewDirection("DOWN");
         }
         if (e.getKeyCode() == KeyEvent.VK_UP) {
-            Game.direction = "UP";
+            this.game.addNewDirection("UP");
         }
     }
 
