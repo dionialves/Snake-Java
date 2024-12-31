@@ -4,6 +4,7 @@ import main.java.com.dionialves.snakeJava.Game;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,13 +42,13 @@ public class Snake {
         this.getVisualSegments().add(new SnakeSegment(70, 385, this.getDirection()));
 
         // Carregamento da sprite
-        String sprite = "src/main/resources/images/sprites-snake-pixel.png";
+        String sprite = "/main/resources/images/sprites-snake-pixel.png";
         this.spriteSheetPixel = new SnakeSprite(sprite);
         this.snakeEye = this.getSpriteSheetPixel().getImageFromSprite(23, 40, 40,40);
         this.snakeNose = this.getSpriteSheetPixel().getImageFromSprite(50, 206, 10,90);
     }
 
-    // Método para atualizar a logica da main.java.com.dionialves.snakeJava.entities.Snake, primeiramente movimentando a cabeça, e depois construindo o restante
+    // Método para atualizar a logica da Snake, primeiramente movimentando a cabeça, e depois construindo o restante
     // do corpo
     public void update() {
         // Move cabeça da snake para frente, independente da direção
@@ -56,7 +57,7 @@ public class Snake {
         this.updateVisualSegments();
     }
 
-    // Desenha a main.java.com.dionialves.snakeJava.entities.Snake na tela
+    // Desenha a Snake na tela
     public void draw(Graphics2D g2d) {
 
         // Depois desenha a snake visual
@@ -65,7 +66,7 @@ public class Snake {
         this.drawSnake(g2d, this.getLogicalSegments(), this.getLogicalSegments().size()-1, false);
         // Desenha os Olhos da Snake
         this.drawEye(g2d);
-        // Desenha o Naris
+        // Desenha o nariz
         this.drawNose(g2d);
     }
 

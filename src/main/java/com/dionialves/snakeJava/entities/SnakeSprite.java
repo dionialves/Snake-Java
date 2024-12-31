@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
 
 // Essa classe é responsável por gerenciar as imagens da snake, ela recebe a sprite completa e tem métodos para retornar
 // exatamente a imagem que preciso. Também tem um método para rotacionar a imagem.
@@ -13,7 +14,8 @@ public class SnakeSprite {
 
     public SnakeSprite(String filePath) {
         try {
-            this.setSprite(ImageIO.read(new File(filePath)));
+            InputStream inputSpriteSnake = getClass().getResourceAsStream(filePath);
+            this.setSprite(ImageIO.read(inputSpriteSnake));
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -105,16 +105,10 @@ public class Game {
                 // emite som de game
                 SoundManager.playSound("gameover");
             }
-
-
-
         }
     }
 
     public void draw(Graphics2D g2d) {
-
-
-
         // Define uma matrix para desenhar o quadrante do game, com tamanho de cada posição o valor de CELLSIZE
         int[][] matrix = new int[Game.HEIGHT/ Game.CELLSIZE][Game.WIGHT/ Game.CELLSIZE];
         // Loop para desenhar esse quatro, que ficará em formato xadrez!
@@ -145,8 +139,6 @@ public class Game {
         this.snake.draw(g2d);
         // Desenha o Food
         this.food.draw(g2d);
-
-
     }
 
     // método responsável por avaliar se a snake comeu o food. Usando o método intersects, que verifica se um retànfulo

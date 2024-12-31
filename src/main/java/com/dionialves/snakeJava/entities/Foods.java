@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
 
 // Classe responsável pelo food do game!
 public class Foods {
@@ -37,13 +38,15 @@ public class Foods {
         // através do método "intersects".
         this.setBody(new Rectangle(this.getNormalSize(), this.getNormalSize()));
 
-        // Esse bloco de codigo precisa ser reescrito quando eu for criar uma nova classe que irá gerenciar as sprites
+        // Esse bloco de código precisa ser reescrito quando eu for criar uma nova classe que irá gerenciar as sprites
         // do food
         try {
-            this.setSpriteSheet(ImageIO.read(new File("src/main/resources/images/sprites-foods.png")));
+            InputStream inputFile = getClass().getResourceAsStream("/main/resources/images/sprites-foods.png");
+            this.setSpriteSheet(ImageIO.read(inputFile));
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         // Inicialização da imagem do food e da sombra do mesmo
         this.setFood(this.getSprite(18, 146, 140, 140));
         this.setShadowFood(
