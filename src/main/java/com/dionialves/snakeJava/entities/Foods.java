@@ -14,32 +14,37 @@ public class Foods {
     private int normalSize;
     private int enlargedSize;
     private int currentSize;
-
+    // Através dos atributos abaixo eu consigo manipular o tamanho da foods, possibilitando assim criar um efeito de
+    // movimento, onde a food cresce e diminui de tempos em tempos
     private boolean isNormalSize = true;
     private boolean isAnimation = false;
     private boolean isShadow;
+    // Atributos que carregam a imagem do food.
+    // Futuramente preciso modificar a logica criando uma classe separada para gerenciar as sprites.
     private BufferedImage spriteSheet;
     private BufferedImage food;
     private BufferedImage shadowFood;
-
 
     public Foods(boolean isAnimation, boolean isShadow, int size) {
         // Inicializações
         this.setNormalSize(size);
         this.setEnlargedSize(size + 4);
         this.setCurrentSize(size);
-
         this.setAnimation(isAnimation);
         this.setShadow(isShadow);
-
+        // Por mais que o food seja representado visualmente por uma imagem, mantive na parte logica, com um retangulo
+        // assim consigo saber de forma fácil quando ele se colide com a snake, que também e um retângulo. Faço isso
+        // através do método "intersects".
         this.setBody(new Rectangle(this.getNormalSize(), this.getNormalSize()));
 
+        // Esse bloco de codigo precisa ser reescrito quando eu for criar uma nova classe que irá gerenciar as sprites
+        // do food
         try {
             this.setSpriteSheet(ImageIO.read(new File("src/main/resources/images/sprites-foods.png")));
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        // Inicialização da imagem do food e da sombra do mesmo
         this.setFood(this.getSprite(18, 146, 140, 140));
         this.setShadowFood(
                 ShadowGenerator.addShadowToImage(this.getFood(),
@@ -47,9 +52,9 @@ public class Foods {
                         1,
                         new Color(0,0,0, 30))
         );
-
+        // Aqui dou start a animação
         if (this.isAnimation) {
-            Timer timer = new Timer(1000, e -> toggleSize());
+            Timer timer = new Timer(750, e -> toggleSize());
             timer.start();
         }
     }
@@ -62,12 +67,16 @@ public class Foods {
         int width = this.getCurrentSize();
         int height = this.getCurrentSize();
 
-        if (!isNormalSize) {
+        // Se normalSize for true, pega as informações do tamanho normal do food, caso contrário pega o tamanho largo
+        // do food.
+        // Essa logica pode ser melhorada
+        if (isNormalSize) {
+            this.setCurrentSize(this.getNormalSize());
+        } else {
             x -= 2;
             y -= 2;
             this.setCurrentSize(this.getEnlargedSize());
-        } else {
-            this.setCurrentSize(this.getNormalSize());
+
         }
         if (this.isShadow()) {
             g2d.drawImage(
@@ -91,27 +100,6 @@ public class Foods {
 
     public BufferedImage getSprite(int x, int y, int width, int height) {
         return this.getSpriteSheet().getSubimage(x, y, width, height);
-    }
-
-    public static BufferedImage addShadow(BufferedImage original, int offsetX, int offsetY, Color shadowColor) {
-        // Dimensões do novo canvas para incluir a sombra
-        int width = original.getWidth() + Math.abs(offsetX);
-        int height = original.getHeight() + Math.abs(offsetY);
-
-        // Criar imagem com espaço extra para a sombra
-        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-
-        Graphics2D g2d = result.createGraphics();
-
-        // Desenhar a sombra
-        g2d.setColor(shadowColor);
-        g2d.drawImage(original, offsetX, offsetY, shadowColor, null);
-
-        // Desenhar a imagem original por cima
-        g2d.drawImage(original, 0, 0, null);
-
-        g2d.dispose();
-        return result;
     }
 
     // Alterna entre os tamanhos normal e ampliado

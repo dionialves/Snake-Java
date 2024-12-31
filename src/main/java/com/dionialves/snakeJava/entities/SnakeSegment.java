@@ -4,6 +4,9 @@ import main.java.com.dionialves.snakeJava.Game;
 
 import java.awt.*;
 
+// Criei essa classa para gerenciar os seguimentos da snake, pois preciso que cada seguimento seja um retângulo, pois
+// uso o retângulo para algumas validações, como colisão, mas também preciso que cada seguimento tenha uma direção.
+// Melhor opção foi criar uma classe separada
 public class SnakeSegment extends Rectangle {
     private String direction;
 

@@ -11,7 +11,7 @@ import java.util.Objects;
 public class GameEngine extends JPanel implements Runnable, KeyListener {
     public static final int WIDTH = 665;
     public static final int HEIGHT = 660;
-    private final int fps = 180;
+    private final int fps = 240;
 
     private final Game game = new Game();
     private final Foods food = new Foods(false, false, 35);

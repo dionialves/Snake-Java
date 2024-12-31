@@ -19,6 +19,10 @@ public class Snake {
     private final List<SnakeSegment> logicalSegments = new ArrayList<>();
     private final List<SnakeSegment> visualSegments = new ArrayList<>();
 
+    // Imagem com a sprite em pixelart
+    private SnakeSprite spriteSheetPixel;
+    private BufferedImage snakeEye;
+    private BufferedImage snakeNose;
 
     // Direção que a cabeça da main.java.com.dionialves.snakeJava.entities.Snake está indo
     private String direction;
@@ -35,6 +39,12 @@ public class Snake {
         this.getVisualSegments().add(new SnakeSegment(140, 385, this.getDirection()));
         this.getVisualSegments().add(new SnakeSegment(105, 385, this.getDirection()));
         this.getVisualSegments().add(new SnakeSegment(70, 385, this.getDirection()));
+
+        // Carregamento da sprite
+        String sprite = "src/main/resources/images/sprites-snake-pixel.png";
+        this.spriteSheetPixel = new SnakeSprite(sprite);
+        this.snakeEye = this.getSpriteSheetPixel().getImageFromSprite(23, 40, 40,40);
+        this.snakeNose = this.getSpriteSheetPixel().getImageFromSprite(50, 206, 10,90);
     }
 
     // Método para atualizar a logica da main.java.com.dionialves.snakeJava.entities.Snake, primeiramente movimentando a cabeça, e depois construindo o restante
@@ -53,6 +63,10 @@ public class Snake {
         this.drawSnake(g2d, this.getVisualSegments(), this.getVisualSegments().size(), false);
         // Desenha primeiramente a snake logica
         this.drawSnake(g2d, this.getLogicalSegments(), this.getLogicalSegments().size()-1, false);
+        // Desenha os Olhos da Snake
+        this.drawEye(g2d);
+        // Desenha o Naris
+        this.drawNose(g2d);
     }
 
     private void drawSnake(Graphics2D g2d, List<SnakeSegment> snakeSegment, int size, boolean isShadow) {
@@ -100,6 +114,108 @@ public class Snake {
             b = Math.max(0, Math.min(255, b));
 
         }
+    }
+
+    private void drawEye(Graphics2D g2d) {
+        SnakeSegment first = this.getVisualSegments().getFirst();
+
+        int angle = 0;
+        int xEyeRight = 0;
+        int yEyeRight = 0;
+        int xEyeLeft = 0;
+        int yEyeLeft = 0;
+
+        switch (first.getDirection()) {
+            case "RIGHT":
+                xEyeRight  = (int) first.getX();
+                yEyeRight  = (int) first.getY();
+                xEyeLeft  = (int) first.getX();
+                yEyeLeft = (int) first.getY() + 19;
+                break;
+            case "LEFT":
+                angle = 180;
+
+                xEyeRight  = (int) first.getX()-5;
+                yEyeRight  = (int) first.getY()-5;
+                xEyeLeft  = (int) first.getX() -5;
+                yEyeLeft = (int) first.getY() -24;
+                break;
+            case "UP":
+                angle = 270;
+
+                xEyeRight  = (int) first.getX();
+                yEyeRight  = (int) first.getY()-5;
+                xEyeLeft  = (int) first.getX() + 19;
+                yEyeLeft = (int) first.getY()-5;
+                break;
+            case "DOWN":
+                angle = 90;
+
+                xEyeRight  = (int) first.getX()-5;
+                yEyeRight  = (int) first.getY();
+                xEyeLeft  = (int) first.getX() - 24;
+                yEyeLeft = (int) first.getY();
+                break;
+        }
+        this.getSpriteSheetPixel().drawRotatedImage(
+                g2d,
+                this.getSnakeEye(),
+                angle,
+                xEyeRight,
+                yEyeRight,
+                15,
+                15
+        );
+        this.getSpriteSheetPixel().drawRotatedImage(
+                g2d,
+                this.getSnakeEye(),
+                angle,
+                xEyeLeft,
+                yEyeLeft,
+                15,
+                15
+        );
+    }
+
+    private void drawNose(Graphics2D g2d) {
+        SnakeSegment first = this.getVisualSegments().getFirst();
+        int angle = 0;
+        int x = 0;
+        int y = 0;
+
+        switch (first.getDirection()) {
+            case "RIGHT":
+                x  = (int) first.getX() + 25;
+                y  = (int) first.getY() + 5;
+                break;
+            case "LEFT":
+                x  = (int) first.getX() + 5;
+                y  = (int) first.getY() + 5;
+                break;
+            case "UP":
+                angle = 90;
+
+                x  = (int) first.getX() - 20;
+                y  = (int) first.getY() - 35;
+                break;
+            case "DOWN":
+                angle = 90;
+
+                x  = (int) first.getX() - 20;
+                y  = (int) first.getY() - 15;
+                break;
+        }
+        this.getSpriteSheetPixel().drawRotatedImage(
+                g2d,
+                this.getSnakeNose(),
+                angle,
+                x,
+                y,
+                3,
+                25
+        );
+
+
     }
 
     public void moveVisualSnake() {
@@ -247,5 +363,29 @@ public class Snake {
 
     public List<SnakeSegment> getVisualSegments() {
         return visualSegments;
+    }
+
+    public SnakeSprite getSpriteSheetPixel() {
+        return spriteSheetPixel;
+    }
+
+    public void setSpriteSheetPixel(SnakeSprite spriteSheetPixel) {
+        this.spriteSheetPixel = spriteSheetPixel;
+    }
+
+    public BufferedImage getSnakeEye() {
+        return snakeEye;
+    }
+
+    public void setSnakeEye(BufferedImage snakeEye) {
+        this.snakeEye = snakeEye;
+    }
+
+    public BufferedImage getSnakeNose() {
+        return snakeNose;
+    }
+
+    public void setSnakeNose(BufferedImage snakeNose) {
+        this.snakeNose = snakeNose;
     }
 }

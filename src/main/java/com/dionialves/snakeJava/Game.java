@@ -12,19 +12,22 @@ import java.util.List;
 
 // Ajustes que devem ser feitos:
 
-// Bugs
-// 1: Ajustar a logica de colisão dos limites;
-// 2: Ajustar a logica de colisão na própria snake
-// 3: Ao adicionar um novo segmento, a direção desse novo segmento não segue a snake, causando um efeito visual não desejado
-// 4: Melhorar a logica de sombreamento da snake
-// 5: Ajustar o aumento do food, pois quando ele aumenta, continua tendo como referência o mesmo x e y, com isso
-//    o aumento parte de um ponto, gostaria que aumentasse em todos os sentidos.
-// 6: Quando existe um movimento repetitivo e rápido o som não sai direito
+// Bugs e melhorias
+// - Ao adicionar um novo segmento, a direção desse novo segmento não segue a snake, causando um efeito visual não desejado;
+// - Melhorar a logica de sombreamento da snake;
+// - Quando existe um movimento repetitivo e rápido o som não sai direito;
+// - Melhorar logica da animação do food, tentar simplificar o código que hoje esta complexo;
+// - Criar classe para gerênciar as sprites dos foods;
+// - Melhorar o método de rotacionar a imagem da snake, não quero que rotacione e desenho na tela, apenas que rotacione
+// - Hoje temos uma snake logica e outra virtual, todas sendo comandadas pela classe Snake. Modificar a logica para que
+//   cada snake seja uma estancia da classe Snake, e trabalhar os atributos de cor e movimentação separadamente
 
 // Implementações
-// 1: Desenhar uma cabeça para a snake
-// 2: Ajustar o topo do game
-// 3: Adicionar imagem do food
+// - Implementar uma colisão onde o nariz da snake amassa e ela retrocede um segmento;
+// - Criar o movimento de piscar dos olhos;
+// - fazer com que os olhos girem no sentido da food
+// - implementar a lingua da snake
+// - implementar o movimento de abertura da boca
 
 public class Game {
     // Atributos de controle do game
@@ -35,7 +38,8 @@ public class Game {
     public static final int CELLSIZE = 35;
 
     private boolean gameOver = false;
-    // Coloquei uma lista de direções pois
+    // Coloquei uma lista de direções para melhorar a jogabilidade, essa lista guarda 3 posições que serão as futuras
+    // movimentações da snake.
     private List<String> listDirection = new ArrayList<>();
     private final Random random = new Random();
 
@@ -53,11 +57,6 @@ public class Game {
         // comer o food
         this.coordinatesOfFood();
 
-        // inicialização da direção
-        this.getListDirection().addFirst("RIGHT");
-
-
-
         // Load sons do game
         SoundManager.loadSound("bite", "src/main/resources/sounds/bite.wav");
         SoundManager.loadSound("gameover", "src/main/resources/sounds/gameover.wav");
@@ -66,10 +65,9 @@ public class Game {
 
     public void update() {
 
+        // O estado gameOver define se o game continua executando
         if (!this.isGameOver()) {
-
             this.setTimer(this.getTimer() + 1);
-
 
             // Se snake comeu o food:
             // 1: Adiciona o som de mordida
@@ -81,23 +79,22 @@ public class Game {
                 this.snake.addSegment();
             }
 
-            if (this.getTimer() % 35 == 0) {
-                // Atualiza as posições da main.java.com.dionialves.snakeJava.entities.Snake
+            // Bloco de código é executado a cada 35 frames, hoje representado por Game.CELLSIZE
+            if (this.getTimer() % Game.CELLSIZE == 0) {
+                // Atualiza as posições logicas da snake.
+                // Atualmente se tem duas snakes sendo desenhadas, uma visual que vai a frente da logica, para dar uma
+                // sensação de fluides na movimentação da snake. E outra snake lógica se movimentando com espaços de
+                // cada seguimento, no caso esse valor está definido em Game.CELLSIZE.
                 this.snake.update();
-
-                int x = (int) this.snake.getLogicalSegments().getFirst().getX();
-                int y = (int) this.snake.getLogicalSegments().getFirst().getY();
-
-                if (x % Game.CELLSIZE == 0 && y % Game.CELLSIZE == 0) {
-                    System.out.println(this.getListDirection());
-                    if (!this.getListDirection().isEmpty()) {
-                        this.snake.changeDirection(this.getListDirection().getFirst());
-                        this.getListDirection().removeFirst();
-                    }
-
+                // Se lista de direções não estiver vazia, entra para modificar a direção da cabeça da snake
+                if (!this.getListDirection().isEmpty()) {
+                    // Pegamos a primeira posição, da lista e modificação a direção da cabeça da snake
+                    this.snake.changeDirection(this.getListDirection().getFirst());
+                    // Após isso retiramos essa posição da lista
+                    this.getListDirection().removeFirst();
                 }
             }
-
+            // Atualiza a movimentação da snake Visual
             this.snake.moveVisualSnake();
 
             // Verifica se existe alguma colisão
@@ -173,7 +170,7 @@ public class Game {
         // Verificação se a snake colidiu com ela mesma
         // Nesse for não checamos as 4 primeiras posições, pois é impossível ter uma colisão nessas posições
         for (int i = 4; i < this.snake.getLogicalSegments().size(); i++) {
-            if (this.snake.getLogicalSegments().getFirst().intersects(this.snake.getLogicalSegments().get(i))) {
+            if (this.snake.getVisualSegments().getFirst().intersects(this.snake.getLogicalSegments().get(i))) {
                 return true;
             }
         }
