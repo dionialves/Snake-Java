@@ -10,8 +10,8 @@ Java foi escolhido por ser a linguagem em que trabalho atualmente. Este projeto 
 
 ## Próximas Implementações
 
-- Implementar animação de abertura da boca
+- Implementar animação de abertura da boca;
 - Implementar um sistema de pontuação com salvamento de recordes;
 - Aumentar a dificuldade ao longo do tempo, acelerando a velocidade da cobra;
 - Criar um modo de partidas rápidas;
-- Desenvolver uma campanha com fases progressivas.
+- Desenvolver uma campanha com fases progressivas;
