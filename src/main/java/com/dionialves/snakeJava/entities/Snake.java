@@ -4,19 +4,27 @@ import main.java.com.dionialves.snakeJava.Game;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-// Classe muito importante que possui os parâmetros da main.java.com.dionialves.snakeJava.entities.Snake
+/**
+ * Representa a Snake dfo game
+ *
+ * <p>Esta classe possui a implementação da Snake.</p>
+ *
+ * @author Dioni Alves
+ * @version 0.3.0
+ * @since 2024-12-20
+ */
+
 public class Snake {
-    // Atributo que define o tamanho do corpo da snake, muito usado em todo o codigo;
+    // Atributo que define o tamanho do corpo da snake;
     private final int bodySizeWight = Game.CELLSIZE;
     private final int bodySizeHeight = Game.CELLSIZE;
 
-    // Lista de retângulos que compreendem a snake
+    // Lista da classe SnakeSegment, customizada para representar cada segmento da Snake
     private final List<SnakeSegment> logicalSegments = new ArrayList<>();
     private final List<SnakeSegment> visualSegments = new ArrayList<>();
 
@@ -215,8 +223,6 @@ public class Snake {
                 3,
                 25
         );
-
-
     }
 
     public void moveVisualSnake() {
@@ -330,13 +336,16 @@ public class Snake {
         }
     }
 
+    /**
+     * Adiciona um segmento novo ao final da snake
+     *
+     * O segmento é adicionado fora da visão do game, o objeto só será visível quando
+     * a snake as posições da snake forem atualizadas
+     *
+     */
     public void addSegment() {
-        int x = (int) this.getLogicalSegments().getLast().getX();
-        int y = (int) this.getLogicalSegments().getLast().getY();
-        String direction = this.getLogicalSegments().getLast().getDirection();
-
-        this.getLogicalSegments().addLast(new SnakeSegment(x, y, direction));
-        this.getVisualSegments().addLast(new SnakeSegment(x, y, direction));
+        this.getLogicalSegments().addLast(new SnakeSegment(-100, -100, ""));
+        this.getVisualSegments().addLast(new SnakeSegment(-100, -100, ""));
     }
 
     public String getDirection() {

@@ -13,14 +13,16 @@ import java.util.List;
 // Ajustes que devem ser feitos:
 
 // Bugs e melhorias
-// - Ao adicionar um novo segmento, a direção desse novo segmento não segue a snake, causando um efeito visual não desejado;
 // - Melhorar a logica de sombreamento da snake;
-// - Quando existe um movimento repetitivo e rápido o som não sai direito;
 // - Melhorar logica da animação do food, tentar simplificar o código que hoje esta complexo;
 // - Criar classe para gerênciar as sprites dos foods;
-// - Melhorar o método de rotacionar a imagem da snake, não quero que rotacione e desenho na tela, apenas que rotacione
+// - Melhorar o método de rotacionar a imagem da snake, não quero que rotacione e desenho na tela, apenas que rotacione,
+//   ou seja, separar os metodos
 // - Hoje temos uma snake logica e outra virtual, todas sendo comandadas pela classe Snake. Modificar a logica para que
 //   cada snake seja uma estancia da classe Snake, e trabalhar os atributos de cor e movimentação separadamente
+// - Entender cada linha da class SoundManager
+// - Adicionar comentários as classes atributos e métodos, no formato lido pelo javadoc
+
 
 // Implementações
 // - Implementar uma colisão onde o nariz da snake amassa e ela retrocede um segmento;
