@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Representa a Snake dfo game
+ * Representa a Snake do game
  *
  * <p>Esta classe possui a implementação da Snake.</p>
  *
@@ -28,27 +28,25 @@ public class Snake {
     private final List<SnakeSegment> logicalSegments = new ArrayList<>();
     private final List<SnakeSegment> visualSegments = new ArrayList<>();
 
-    // Imagem com a sprite em pixelart
+    // Imagem da sprite em pixelart
     private SnakeSprite spriteSheetPixel;
     private BufferedImage snakeEye;
     private BufferedImage snakeNose;
 
-    // Direção que a cabeça da main.java.com.dionialves.snakeJava.entities.Snake está indo
+    // Direção que a cabeça da snakeJava.entities.Snake está indo
     private String direction;
 
     public Snake(String direction) {
-
+        // Inicialização da direção da snake
         this.setDirection(direction);
-        // Desenho os 3 primeiras partes da main.java.com.dionialves.snakeJava.entities.Snake, pode observar que apenas a cabeça tem coordenadas
-        // isso é necessário, pois todas as outras partes seguiram a cabeça.
+        // Iniciando a snake logica com as três primeiras posições
         this.getLogicalSegments().add(new SnakeSegment(140, 385, this.getDirection()));
         this.getLogicalSegments().add(new SnakeSegment(105, 385, this.getDirection()));
         this.getLogicalSegments().add(new SnakeSegment(70, 385, this.getDirection()));
-
+        // iniciando a snake visual com as três primeiras posições
         this.getVisualSegments().add(new SnakeSegment(140, 385, this.getDirection()));
         this.getVisualSegments().add(new SnakeSegment(105, 385, this.getDirection()));
         this.getVisualSegments().add(new SnakeSegment(70, 385, this.getDirection()));
-
         // Carregamento da sprite
         String sprite = "/main/resources/images/sprites-snake-pixel.png";
         this.spriteSheetPixel = new SnakeSprite(sprite);
@@ -56,16 +54,34 @@ public class Snake {
         this.snakeNose = this.getSpriteSheetPixel().getImageFromSprite(50, 206, 10,90);
     }
 
+    /**
+     * Atualiza as posições da snake
+     *
+     * <p></>Aqui temos a atualização das posições da snake. Primeiramente movemos o corpo, ou seja, todas as partes menos a
+     * cabeça, depois movimentamos a cabeça.</p>
+     *
+     * <p>Depois copiamos as posições da snake logica para a sake visual.</p>
+     */
+
     // Método para atualizar a logica da Snake, primeiramente movimentando a cabeça, e depois construindo o restante
     // do corpo
     public void update() {
+        // Update body
+        this.moveBody();
         // Move cabeça da snake para frente, independente da direção
         this.moveHead();
         // Seta as coordenadas da snake nos retângulos, isso é importando para a logica da verificação de colisões
         this.updateVisualSegments();
     }
 
-    // Desenha a Snake na tela
+    /**
+     * Desenha a snake na tela;
+     *
+     * <p>Neste método, centralizo todos os desenhos da snake. Primeiramente a snake visual, depois a snake logica,
+     *  em seguida os olho e cauda</>
+     *
+     * @param g2d recebido do paintComponent da classe GameEngine
+     */
     public void draw(Graphics2D g2d) {
 
         // Depois desenha a snake visual
@@ -78,8 +94,20 @@ public class Snake {
         this.drawNose(g2d);
     }
 
+    /**
+     * Desenha a snake na tela;
+     *
+     * <p>Responsável por desenha a snake, tanto logica como visual</>
+     *
+     * @param g2d recebido do draw desta mesma classe.
+     * @param snakeSegment recebe o tipo de snake, logica ou visual
+     * @param size recebe o tamanho da snake
+     * @param isShadow recebe a informação se é para desenhar a sombra da snake
+     *
+     */
     private void drawSnake(Graphics2D g2d, List<SnakeSegment> snakeSegment, int size, boolean isShadow) {
-        List<String> directions = Arrays.asList("LEFT", "RIGHT");
+
+        // M
         int r = 78;
         int g = 123;
         int b = 244;
@@ -263,22 +291,9 @@ public class Snake {
     // Após a movimentação, adiciona a posição no atributo segments. Pode-se observar que é adicionado a posição no
     // índice 0. Essa lista de posições também tem um limite, que seria o tamanho de bodySizeWight * o tamanho do corpo da
     // snake.
-    public void moveHead() {
+    private void moveHead() {
         int x = (int) this.getLogicalSegments().getFirst().getX();
         int y = (int) this.getLogicalSegments().getFirst().getY();
-        int segmentSize = 40;
-
-        // Atualizar os segmentos seguintes
-        for (int i = this.getLogicalSegments().size()-1; i > 0; i--) {
-
-            SnakeSegment current = this.getLogicalSegments().get(i);
-            SnakeSegment previous = this.getLogicalSegments().get(i - 1);
-
-            current.setX((int)previous.getX());
-            current.setY((int)previous.getY());
-            current.setDirection(previous.getDirection());
-
-        }
 
         // Atualiza a posição da cabeça
         this.getLogicalSegments().getFirst().setDirection(this.getDirection());
@@ -295,6 +310,18 @@ public class Snake {
             case "LEFT":
                 this.getLogicalSegments().getFirst().setX(x-35);
                 break;
+        }
+    }
+
+    private void moveBody() {
+        // Atualizar os segmentos seguintes
+        for (int i = this.getLogicalSegments().size()-1; i > 0; i--) {
+            SnakeSegment current = this.getLogicalSegments().get(i);
+            SnakeSegment previous = this.getLogicalSegments().get(i - 1);
+
+            current.setX((int)previous.getX());
+            current.setY((int)previous.getY());
+            current.setDirection(previous.getDirection());
         }
     }
 
