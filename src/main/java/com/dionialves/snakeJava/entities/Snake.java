@@ -4,10 +4,8 @@ import main.java.com.dionialves.snakeJava.Game;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Representa a Snake do game
@@ -32,6 +30,9 @@ public class Snake {
     private SnakeSprite spriteSheetPixel;
     private BufferedImage snakeEye;
     private BufferedImage snakeNose;
+
+    // Atributo responsável por guardar a cor da snake
+    private final Map<String, Integer> colorSnakeRGB = new HashMap<>();
 
     // Direção que a cabeça da snakeJava.entities.Snake está indo
     private String direction;
@@ -67,18 +68,26 @@ public class Snake {
     // do corpo
     public void update() {
         // Update body
-        this.moveBody();
+        this.updateBodyPosition();
         // Move cabeça da snake para frente, independente da direção
         this.moveHead();
         // Seta as coordenadas da snake nos retângulos, isso é importando para a logica da verificação de colisões
-        this.updateVisualSegments();
+        this.syncVisualSegmentsWithLogicalSegments();
     }
 
     /**
      * Desenha a snake na tela;
      *
      * <p>Neste método, centralizo todos os desenhos da snake. Primeiramente a snake visual, depois a snake logica,
-     *  em seguida os olho e cauda</>
+     *  em seguida os olho e cauda</p>
+     *
+     * <p>Uma explicação sobre snake logicas e snake visual:
+     * Snake logica será a base da movimentação da snake, se movimentando de setor em setor da matrix, isso é necessário
+     * para termos uma snake base, onde iremos usar a mesma para nos movimentar pela matriz do jogo.
+     *
+     * Snake Visual é usada apenas para suavizar a movimentação, e sua atualização é de 1 pixel por vez, criando uma
+     * sensação de fluides na movimentação.
+     * </p>
      *
      * @param g2d recebido do paintComponent da classe GameEngine
      */
@@ -106,11 +115,7 @@ public class Snake {
      *
      */
     private void drawSnake(Graphics2D g2d, List<SnakeSegment> snakeSegment, int size, boolean isShadow) {
-
-        // M
-        int r = 78;
-        int g = 123;
-        int b = 244;
+        this.setColorSnakeRGB(78, 123, 244);
 
         for (int i = 0; i < size; i++) {
 
@@ -134,7 +139,11 @@ public class Snake {
                         null);
             }
 
-            g2d.setColor(new Color(r, g, b));
+            g2d.setColor(new Color(
+                    this.getColorSnakeRGB().get("r"),
+                    this.getColorSnakeRGB().get("g"),
+                    this.getColorSnakeRGB().get("b")
+            ));
             // Desenho do segmento
             g2d.fillRect(
                     (int) snakeSegment.get(i).getX(),
@@ -143,16 +152,19 @@ public class Snake {
                     this.getBodySizeHeight()
             );
 
-            r -= 6;
-            g -= 6;
-            b -= 9;
-            r = Math.max(0, Math.min(255, r));
-            g = Math.max(0, Math.min(255, g));
-            b = Math.max(0, Math.min(255, b));
-
+            this.darkenColorForSegment();
         }
     }
 
+    /**
+     * Desenha os olhos da Snake
+     *
+     * <p>Responsável por desenhar os olhos na snake, e também a movimentação dos olhos, dependêndo da direção que
+     * a snake estiver</p>
+     *
+     * @param g2d recebido do draw desta mesma classe.
+     *
+     */
     private void drawEye(Graphics2D g2d) {
         SnakeSegment first = this.getVisualSegments().getFirst();
 
@@ -214,6 +226,15 @@ public class Snake {
         );
     }
 
+    /**
+     * Desenha o nariz da snake
+     *
+     * <p>Responsável por desenhar o nariz da snake, e também sua movimentação, dependêndo da direção que
+     * a snake estiver</p>
+     *
+     * @param g2d recebido do draw desta mesma classe.
+     *
+     */
     private void drawNose(Graphics2D g2d) {
         SnakeSegment first = this.getVisualSegments().getFirst();
         int angle = 0;
@@ -253,6 +274,36 @@ public class Snake {
         );
     }
 
+    /**
+     * Reduz o tom da cor da snake
+     *
+     * <p>Este método altera o tom da cor da snake para baixo, ou seja, a cada execução ele fica mais escuro</p>
+     *
+     */
+    private void darkenColorForSegment() {
+
+        int r = this.getColorSnakeRGB().get("r");
+        int g = this.getColorSnakeRGB().get("g");
+        int b = this.getColorSnakeRGB().get("b");
+
+        r -= 6;
+        g -= 6;
+        b -= 9;
+        r = Math.max(0, Math.min(255, r));
+        g = Math.max(0, Math.min(255, g));
+        b = Math.max(0, Math.min(255, b));
+
+        this.setColorSnakeRGB(r, g, b);
+    }
+
+    /**
+     * Faz a movimentação da Snake Visual
+     *
+     * <p>Na movimentação da Snake temos a snake Visual, que faz uma movimentação mais suave avançando sempre 1px.
+     * este método é responsável por fazer a movimentação de cada seguimento, 1px por vez, na direção que o segmento tem
+     * </p>
+     *
+     */
     public void moveVisualSnake() {
         for (int i = 0; i < this.getVisualSegments().size(); i ++) {
             SnakeSegment currentSegment = this.getVisualSegments().get(i);
@@ -286,11 +337,13 @@ public class Snake {
         }
     }
 
-    // Método responsável por movimentar a cabeça da snake, movimetando um 1 posição no quadro dependendo da direção
-    // escolhida pelo usuário. Caso não seja trocado a direção ela segue em frente, dependendo da direção.
-    // Após a movimentação, adiciona a posição no atributo segments. Pode-se observar que é adicionado a posição no
-    // índice 0. Essa lista de posições também tem um limite, que seria o tamanho de bodySizeWight * o tamanho do corpo da
-    // snake.
+    /**
+     * Faz a movimentação da cabeça da snake logica
+     *
+     * <p> Primeiramente é atualizado a direção da cabeça da snake, depois movimenta a cabeça da cobra, na direção
+     * definida para a snake. O tamanho dessa movimentação segue o espaçamento da matrix do jogo.</p>
+     *
+     */
     private void moveHead() {
         int x = (int) this.getLogicalSegments().getFirst().getX();
         int y = (int) this.getLogicalSegments().getFirst().getY();
@@ -299,21 +352,30 @@ public class Snake {
         this.getLogicalSegments().getFirst().setDirection(this.getDirection());
         switch (this.getDirection()) {
             case "UP":
-                this.getLogicalSegments().getFirst().setY(y-35);
+                this.getLogicalSegments().getFirst().setY(y-Game.CELLSIZE);
                 break;
             case "RIGHT":
-                this.getLogicalSegments().getFirst().setX(x+35);
+                this.getLogicalSegments().getFirst().setX(x+Game.CELLSIZE);
                 break;
             case "DOWN":
-                this.getLogicalSegments().getFirst().setY(y+35);
+                this.getLogicalSegments().getFirst().setY(y+Game.CELLSIZE);
                 break;
             case "LEFT":
-                this.getLogicalSegments().getFirst().setX(x-35);
+                this.getLogicalSegments().getFirst().setX(x-Game.CELLSIZE);
                 break;
         }
     }
 
-    private void moveBody() {
+    /**
+    * Atualiza a posição e direção dos segmentos corporais da cobra.
+    *
+    * <p>Este método percorre os segmentos do corpo da cobra, começando no último segmento,
+    * e atualiza a posição e direção de cada segmento para corresponder ao segmento que o precede.
+    * A cabeça da cobra não foi modificada, pois É atualizada separadamente.
+    * Isso garante que o corpo da cobra siga o movimento da cabeça de forma lógica.</p>
+    *
+    */
+    private void updateBodyPosition() {
         // Atualizar os segmentos seguintes
         for (int i = this.getLogicalSegments().size()-1; i > 0; i--) {
             SnakeSegment current = this.getLogicalSegments().get(i);
@@ -325,7 +387,17 @@ public class Snake {
         }
     }
 
-    public void updateVisualSegments() {
+    /**
+     * Sincroniza as informações da snake visual com as da snake logica
+     *
+     * <p>Essa atualização ocorre a cada Game.CELLSIZE frames, ou seja, quando a snake atinge um ponto de movimenta,
+     * que é definido na condição "this.getTimer() % Game.CELLSIZE == 0". Isso é necessário principalmente para
+     * atualizar a direção de cada seguimento.</p>
+     *
+     * <p>Esse método não pode ser confundido com this.moveVisualSnake(), são parecidos mais com funções diferentes</p>
+     *
+     */
+    public void syncVisualSegmentsWithLogicalSegments() {
         for (int i = 0; i < this.getLogicalSegments().size(); i++) {
             SnakeSegment logicalSnake = this.getLogicalSegments().get(i);
             SnakeSegment visualSnake = this.getVisualSegments().get(i);
@@ -337,7 +409,16 @@ public class Snake {
         }
     }
 
-    // Nesse método altera a direção da snake, foi construído para não permitir que a snake faça um retorno de 180 graus
+    /**
+     * Atualiza a direção da snake
+     *
+     * <p>Esse método atualiza a direção da snake, esse atributo é usado para atualizar a direção da cabeça da snake,
+     * quando existe um ponto de movimentação. Támbem é validado se a nova direção é valida, pois eu não posso mudar
+     * a direção da snake de uma para down e vice e versa, e nem de right para left e vice e versa</p>
+     *
+     * @param direction nova direção da snake.
+     *
+     */
     public void changeDirection(String direction) {
         switch (direction) {
             case "UP":
@@ -366,8 +447,11 @@ public class Snake {
     /**
      * Adiciona um segmento novo ao final da snake
      *
-     * O segmento é adicionado fora da visão do game, o objeto só será visível quando
-     * a snake as posições da snake forem atualizadas
+     * <p>Esse método pe chamado quando a snake come uma fruta, então é adicionado um novo segmento ao final da lista
+     * de segmentos logicos e visuais. Pode ser observado que o novo segmento é gerado em uma posição não visível na
+     * tela, isso é necessário para não gerar nenhuma deformidade na snake. Posteriormente esse segmento será
+     * atualizado pelo updateBodyPosition no caso da snake logica e syncVisualSegmentsWithLogicalSegments no caso
+     * da snake visual</p>
      *
      */
     public void addSegment() {
@@ -375,6 +459,7 @@ public class Snake {
         this.getVisualSegments().addLast(new SnakeSegment(-100, -100, ""));
     }
 
+    // Getters e Setters
     public String getDirection() {
         return direction;
     }
@@ -424,5 +509,15 @@ public class Snake {
 
     public void setSnakeNose(BufferedImage snakeNose) {
         this.snakeNose = snakeNose;
+    }
+
+    public Map<String, Integer> getColorSnakeRGB() {
+        return colorSnakeRGB;
+    }
+
+    private void setColorSnakeRGB(int r, int g, int b) {
+            this.getColorSnakeRGB().put("r", r);
+            this.getColorSnakeRGB().put("g", g);
+            this.getColorSnakeRGB().put("b", b);
     }
 }
