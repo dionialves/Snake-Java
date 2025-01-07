@@ -25,6 +25,7 @@ public class Snake {
     // Lista da classe SnakeSegment, customizada para representar cada segmento da Snake
     private final List<SnakeSegment> logicalSegments = new ArrayList<>();
     private final List<SnakeSegment> visualSegments = new ArrayList<>();
+    private final List<SnakeSegment> logicalShadow = new ArrayList<>();
 
     // Imagem da sprite em pixelart
     private SnakeSprite spriteSheetPixel;
@@ -48,6 +49,11 @@ public class Snake {
         this.getVisualSegments().add(new SnakeSegment(140, 385, this.getDirection()));
         this.getVisualSegments().add(new SnakeSegment(105, 385, this.getDirection()));
         this.getVisualSegments().add(new SnakeSegment(70, 385, this.getDirection()));
+        // iniciando a sombra visual da snake
+        this.getLogicalShadow().add(new SnakeSegment(140, 385, this.getDirection()));
+        this.getLogicalShadow().add(new SnakeSegment(105, 385, this.getDirection()));
+        this.getLogicalShadow().add(new SnakeSegment(70, 385, this.getDirection()));
+
         // Carregamento da sprite
         String sprite = "/main/resources/images/sprites-snake-pixel.png";
         this.spriteSheetPixel = new SnakeSprite(sprite);
@@ -72,7 +78,10 @@ public class Snake {
         // Move cabeça da snake para frente, independente da direção
         this.moveHead();
         // Seta as coordenadas da snake nos retângulos, isso é importando para a logica da verificação de colisões
-        this.syncVisualSegmentsWithLogicalSegments();
+        this.syncSnakeSegments(this.getLogicalSegments(), this.getVisualSegments());
+
+        // Atualiza as posições visuais da sombra da snake
+        this.syncSnakeSegments(this.getLogicalSegments(), this.getLogicalShadow());
     }
 
     /**
@@ -92,11 +101,13 @@ public class Snake {
      * @param g2d recebido do paintComponent da classe GameEngine
      */
     public void draw(Graphics2D g2d) {
-
+        // Desenha a sombra da snake
+        this.drawShadow(g2d);
         // Depois desenha a snake visual
         this.drawSnake(g2d, this.getVisualSegments(), this.getVisualSegments().size(), false);
         // Desenha primeiramente a snake logica
         this.drawSnake(g2d, this.getLogicalSegments(), this.getLogicalSegments().size()-1, false);
+
         // Desenha os Olhos da Snake
         this.drawEye(g2d);
         // Desenha o nariz
@@ -118,26 +129,6 @@ public class Snake {
         this.setColorSnakeRGB(78, 123, 244);
 
         for (int i = 0; i < size; i++) {
-
-            // Aqui é uma tentativa de melhorar a logica do sombreamento, impedindo que o segmento 1 (no caso ao segundo)
-            // aparece a sombra quando ele estiver descendo.
-            // preciso melhorar e muito essa logica
-            if (isShadow) {
-
-                BufferedImage ShadowSegment = ShadowGenerator.addShadowToRectangle(
-                        this.getBodySizeWight(),
-                        this.getBodySizeHeight(),
-                        0,
-                        5,
-                        new Color(0, 0, 0, 30)
-                );
-
-                g2d.drawImage(
-                        ShadowSegment,
-                        (int) snakeSegment.get(i).getX(),
-                        (int) snakeSegment.get(i).getY(),
-                        null);
-            }
 
             g2d.setColor(new Color(
                     this.getColorSnakeRGB().get("r"),
@@ -174,7 +165,7 @@ public class Snake {
         int xEyeLeft = 0;
         int yEyeLeft = 0;
 
-        switch (first.getDirection()) {
+        switch (this.getDirection()) {
             case "RIGHT":
                 xEyeRight  = (int) first.getX();
                 yEyeRight  = (int) first.getY();
@@ -241,7 +232,7 @@ public class Snake {
         int x = 0;
         int y = 0;
 
-        switch (first.getDirection()) {
+        switch (this.getDirection()) {
             case "RIGHT":
                 x  = (int) first.getX() + 25;
                 y  = (int) first.getY() + 5;
@@ -272,6 +263,30 @@ public class Snake {
                 3,
                 25
         );
+    }
+
+    private void drawShadow(Graphics2D g2d) {
+
+        // Aqui eu preciso desenhar a sombra horizontalmente e não mais segmento por seguiomento
+        // pois a sombra apenas aparece na horizoltal.
+        // preciso apenas definir qual o tamanho dos seguimentos que estão na horizontal, posso criar uma função que
+        // retorna uma lista de coordenadas, e depois um for que desenha esses retangulos.
+        BufferedImage shadowSegment = ShadowGenerator.addShadowToRectangle(
+                105,
+                this.getBodySizeHeight(),
+                0,
+                5,
+                new Color(0, 0, 0, 30)
+        );
+
+
+                g2d.drawImage(
+                        shadowSegment,
+                        (int) 200,
+                        (int) 200,
+                        null
+                );
+
     }
 
     /**
@@ -334,6 +349,13 @@ public class Snake {
                     currentSegment.setX(x-speed);
                     break;
             }
+
+            // Atualizo a sombra da snake visual preciso mudar essa atualização para um outro metodo, assim separa
+            // da logica desse metodo
+//            this.getVisualShadow().get(i).setLocation(
+//                    (int) currentSegment.getX(),
+//                    (int) currentSegment.getY()
+//            );
         }
     }
 
@@ -397,15 +419,14 @@ public class Snake {
      * <p>Esse método não pode ser confundido com this.moveVisualSnake(), são parecidos mais com funções diferentes</p>
      *
      */
-    public void syncVisualSegmentsWithLogicalSegments() {
-        for (int i = 0; i < this.getLogicalSegments().size(); i++) {
-            SnakeSegment logicalSnake = this.getLogicalSegments().get(i);
-            SnakeSegment visualSnake = this.getVisualSegments().get(i);
+    private void syncSnakeSegments(List<SnakeSegment> listSnakeOrigin, List<SnakeSegment> listSnakeDestination) {
+        for (int i = 0; i < listSnakeOrigin.size(); i++) {
+            SnakeSegment origin = listSnakeOrigin.get(i);
+            SnakeSegment destination = listSnakeDestination.get(i);
 
-            visualSnake.setX((int) logicalSnake.getX());
-            visualSnake.setY((int) logicalSnake.getY());
-            visualSnake.setDirection(logicalSnake.getDirection());
-
+            destination.setX((int) origin.getX());
+            destination.setY((int) origin.getY());
+            destination.setDirection(origin.getDirection());
         }
     }
 
@@ -457,6 +478,7 @@ public class Snake {
     public void addSegment() {
         this.getLogicalSegments().addLast(new SnakeSegment(-100, -100, ""));
         this.getVisualSegments().addLast(new SnakeSegment(-100, -100, ""));
+        this.getLogicalShadow().addLast(new SnakeSegment(-100, -100, ""));
     }
 
     // Getters e Setters
@@ -519,5 +541,9 @@ public class Snake {
             this.getColorSnakeRGB().put("r", r);
             this.getColorSnakeRGB().put("g", g);
             this.getColorSnakeRGB().put("b", b);
+    }
+
+    public List<SnakeSegment> getLogicalShadow() {
+        return logicalShadow;
     }
 }

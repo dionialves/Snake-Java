@@ -13,7 +13,7 @@ import java.util.List;
 // Ajustes que devem ser feitos:
 
 // Bugs e melhorias
-// - Melhorar a logica de sombreamento da snake;
+// - Sombra da snake esta serrilhada nas curvas
 // - Melhorar logica da animação do food, tentar simplificar o código que hoje esta complexo;
 // - Criar classe para gerênciar as sprites dos foods;
 // - Melhorar o método de rotacionar a imagem da snake, não quero que rotacione e desenho na tela, apenas que rotacione,
@@ -22,6 +22,7 @@ import java.util.List;
 //   cada snake seja uma estancia da classe Snake, e trabalhar os atributos de cor e movimentação separadamente
 // - Entender cada linha da class SoundManager
 // - Adicionar comentários as classes atributos e métodos, no formato lido pelo javadoc
+//      - Snake - ok
 
 
 // Implementações
