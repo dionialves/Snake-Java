@@ -13,7 +13,6 @@ import java.util.List;
 // Ajustes que devem ser feitos:
 
 // Bugs e melhorias
-// - Sombra da snake esta serrilhada nas curvas
 // - Melhorar logica da animação do food, tentar simplificar o código que hoje esta complexo;
 // - Criar classe para gerênciar as sprites dos foods;
 // - Melhorar o método de rotacionar a imagem da snake, não quero que rotacione e desenho na tela, apenas que rotacione,
@@ -26,6 +25,7 @@ import java.util.List;
 
 
 // Implementações
+// - Colocar uma sombra na snake
 // - Implementar uma colisão onde o nariz da snake amassa e ela retrocede um segmento;
 // - Criar o movimento de piscar dos olhos;
 // - fazer com que os olhos girem no sentido da food
