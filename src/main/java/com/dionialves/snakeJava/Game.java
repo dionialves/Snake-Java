@@ -13,8 +13,6 @@ import java.util.List;
 // Ajustes que devem ser feitos:
 
 // Bugs e melhorias
-// - Melhorar logica da animação do food, tentar simplificar o código que hoje esta complexo;
-// - Criar classe para gerênciar as sprites dos foods;
 // - Melhorar o método de rotacionar a imagem da snake, não quero que rotacione e desenho na tela, apenas que rotacione,
 //   ou seja, separar os metodos
 // - Hoje temos uma snake logica e outra virtual, todas sendo comandadas pela classe Snake. Modificar a logica para que
@@ -22,6 +20,7 @@ import java.util.List;
 // - Entender cada linha da class SoundManager
 // - Adicionar comentários as classes atributos e métodos, no formato lido pelo javadoc
 //      - Snake - ok
+//      - Food  - ok
 
 
 // Implementações
@@ -31,6 +30,7 @@ import java.util.List;
 // - fazer com que os olhos girem no sentido da food
 // - implementar a lingua da snake
 // - implementar o movimento de abertura da boca
+// - Implementar sprites diferentes para as foods, com isso será necessário criar uma classe para fazer essa gestão
 
 public class Game {
     // Atributos de controle do game

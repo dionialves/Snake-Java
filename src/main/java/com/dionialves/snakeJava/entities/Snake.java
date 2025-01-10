@@ -19,17 +19,17 @@ import java.util.List;
 
 public class Snake {
     // Atributo que define o tamanho do corpo da snake;
-    private final int bodySizeWight = Game.CELLSIZE;
-    private final int bodySizeHeight = Game.CELLSIZE;
+    private static final int BODY_SIZE_WIGHT = Game.CELLSIZE;
+    private static final int BODY_SIZE_HEIGHT = Game.CELLSIZE;
 
     // Lista da classe SnakeSegment, customizada para representar cada segmento da Snake
     private final List<SnakeSegment> logicalSegments = new ArrayList<>();
     private final List<SnakeSegment> visualSegments = new ArrayList<>();
 
-    // Imagem da sprite em pixelart
-    private SnakeSprite spriteSheetPixel;
-    private BufferedImage snakeEye;
-    private BufferedImage snakeNose;
+    // Sprite da snake em píxel art
+    private final SnakeSprite spriteSheetPixel;
+    private final BufferedImage snakeEye;
+    private final BufferedImage snakeNose;
 
     // Atributo responsável por guardar a cor da snake
     private final Map<String, Integer> colorSnakeRGB = new HashMap<>();
@@ -72,7 +72,7 @@ public class Snake {
         this.updateBodyPosition();
         // Move cabeça da snake para frente, independente da direção
         this.moveHead();
-        // Seta as coordenadas da snake nos retângulos, isso é importando para a logica da verificação de colisões
+        // Seta as coordenadas da snake nos retângulos, isso é importando para a lógica da verificação de colisões
         this.syncSnakeSegments(this.getLogicalSegments(), this.getVisualSegments());
     }
 
@@ -84,9 +84,9 @@ public class Snake {
      *
      * <p>Uma explicação sobre snake logicas e snake visual:
      * Snake logica será a base da movimentação da snake, se movimentando de setor em setor da matrix, isso é necessário
-     * para termos uma snake base, onde iremos usar a mesma para nos movimentar pela matriz do jogo.
+     * para termos uma snake base, onde iremos usar a mesma para nos movimentar pela matriz do jogo.</p>
      *
-     * Snake Visual é usada apenas para suavizar a movimentação, e sua atualização é de 1 pixel por vez, criando uma
+     * <p>Snake Visual é usada apenas para suavizar a movimentação, e sua atualização é de 1 píxel por vez, criando uma
      * sensação de fluides na movimentação.
      * </p>
      *
@@ -94,12 +94,12 @@ public class Snake {
      */
     public void draw(Graphics2D g2d) {
         // Depois desenha a snake visual
-        this.drawSnake(g2d, this.getVisualSegments(), this.getVisualSegments().size(), false);
+        this.drawSnake(g2d, this.getVisualSegments(), this.getVisualSegments().size());
         // Desenha primeiramente a snake logica
-        this.drawSnake(g2d, this.getLogicalSegments(), this.getLogicalSegments().size()-1, false);
+        this.drawSnake(g2d, this.getLogicalSegments(), this.getLogicalSegments().size()-1);
 
         // Desenha os Olhos da Snake
-        this.drawEye(g2d);
+        this.drawEyes(g2d);
         // Desenha o nariz
         this.drawNose(g2d);
     }
@@ -112,10 +112,9 @@ public class Snake {
      * @param g2d recebido do draw desta mesma classe.
      * @param snakeSegment recebe o tipo de snake, logica ou visual
      * @param size recebe o tamanho da snake
-     * @param isShadow recebe a informação se é para desenhar a sombra da snake
      *
      */
-    private void drawSnake(Graphics2D g2d, List<SnakeSegment> snakeSegment, int size, boolean isShadow) {
+    private void drawSnake(Graphics2D g2d, List<SnakeSegment> snakeSegment, int size) {
         this.setColorSnakeRGB(78, 123, 244);
 
         for (int i = 0; i < size; i++) {
@@ -129,8 +128,8 @@ public class Snake {
             g2d.fillRect(
                     (int) snakeSegment.get(i).getX(),
                     (int) snakeSegment.get(i).getY(),
-                    this.getBodySizeWight(),
-                    this.getBodySizeHeight()
+                    BODY_SIZE_WIGHT,
+                    BODY_SIZE_HEIGHT
             );
 
             this.darkenColorForSegment();
@@ -146,7 +145,57 @@ public class Snake {
      * @param g2d recebido do draw desta mesma classe.
      *
      */
-    private void drawEye(Graphics2D g2d) {
+    private void drawEyes(Graphics2D g2d) {
+
+        Object[] positionsEyes = this.generationPositionEyes();
+
+        this.getSpriteSheetPixel().drawRotatedImage(
+                g2d,
+                this.getSnakeEye(),
+                (int) positionsEyes[0],
+                (int) positionsEyes[1],
+                (int) positionsEyes[2],
+                15,
+                15
+        );
+        this.getSpriteSheetPixel().drawRotatedImage(
+                g2d,
+                this.getSnakeEye(),
+                (int) positionsEyes[0],
+                (int) positionsEyes[3],
+                (int) positionsEyes[4],
+                15,
+                15
+        );
+    }
+
+    /**
+     * Desenha o nariz da snake
+     *
+     * <p>Responsável por desenhar o nariz da snake, e também sua movimentação, dependêndo da direção que
+     * a snake estiver</p>
+     *
+     * @param g2d recebido do draw desta mesma classe.
+     *
+     */
+    private void drawNose(Graphics2D g2d) {
+
+        Object[] infoNose = this.generationPositionNose();
+        this.getSpriteSheetPixel().drawRotatedImage(
+                g2d,
+                this.getSnakeNose(),
+                (int) infoNose[0],
+                (int) infoNose[1],
+                (int) infoNose[2],
+                3,
+                25
+        );
+    }
+
+    /**
+     * Responsável por gerar as coordenadas dos olhos da snake
+     */
+    private Object[] generationPositionEyes() {
         SnakeSegment first = this.getVisualSegments().getFirst();
 
         int angle = 0;
@@ -187,36 +236,14 @@ public class Snake {
                 yEyeLeft = (int) first.getY();
                 break;
         }
-        this.getSpriteSheetPixel().drawRotatedImage(
-                g2d,
-                this.getSnakeEye(),
-                angle,
-                xEyeRight,
-                yEyeRight,
-                15,
-                15
-        );
-        this.getSpriteSheetPixel().drawRotatedImage(
-                g2d,
-                this.getSnakeEye(),
-                angle,
-                xEyeLeft,
-                yEyeLeft,
-                15,
-                15
-        );
+
+        return new Object[]{angle, xEyeRight, yEyeRight, xEyeLeft, yEyeLeft};
     }
 
     /**
-     * Desenha o nariz da snake
-     *
-     * <p>Responsável por desenhar o nariz da snake, e também sua movimentação, dependêndo da direção que
-     * a snake estiver</p>
-     *
-     * @param g2d recebido do draw desta mesma classe.
-     *
+     * Responsável por gerar as coordenadas do nariz da snake
      */
-    private void drawNose(Graphics2D g2d) {
+    private Object[] generationPositionNose() {
         SnakeSegment first = this.getVisualSegments().getFirst();
         int angle = 0;
         int x = 0;
@@ -244,15 +271,8 @@ public class Snake {
                 y  = (int) first.getY() - 15;
                 break;
         }
-        this.getSpriteSheetPixel().drawRotatedImage(
-                g2d,
-                this.getSnakeNose(),
-                angle,
-                x,
-                y,
-                3,
-                25
-        );
+
+        return new Object[]{angle, x, y};
     }
 
     /**
@@ -281,7 +301,7 @@ public class Snake {
      * Faz a movimentação da Snake Visual
      *
      * <p>Na movimentação da Snake temos a snake Visual, que faz uma movimentação mais suave avançando sempre 1px.
-     * este método é responsável por fazer a movimentação de cada seguimento, 1px por vez, na direção que o segmento tem
+     * Este método é responsável por fazer a movimentação de cada seguimento, 1px por vez, na direção que o segmento tem
      * </p>
      *
      */
@@ -315,13 +335,6 @@ public class Snake {
                     currentSegment.setX(x-speed);
                     break;
             }
-
-            // Atualizo a sombra da snake visual preciso mudar essa atualização para um outro metodo, assim separa
-            // da logica desse metodo
-//            this.getVisualShadow().get(i).setLocation(
-//                    (int) currentSegment.getX(),
-//                    (int) currentSegment.getY()
-//            );
         }
     }
 
@@ -378,8 +391,8 @@ public class Snake {
     /**
      * Sincroniza as informações da snake visual com as da snake logica
      *
-     * <p>Essa atualização ocorre a cada Game.CELLSIZE frames, ou seja, quando a snake atinge um ponto de movimenta,
-     * que é definido na condição "this.getTimer() % Game.CELLSIZE == 0". Isso é necessário principalmente para
+     * <p>Essa atualização ocorre a cada ciclo de frames, ou seja, quando a snake atinge um ponto de movimento,
+     * que é definido, na condição "this.getTimer() % Game.CELLSIZE == 0". Isso é necessário principalmente para
      * atualizar a direção de cada seguimento.</p>
      *
      * <p>Esse método não pode ser confundido com this.moveVisualSnake(), são parecidos mais com funções diferentes</p>
@@ -400,7 +413,7 @@ public class Snake {
      * Atualiza a direção da snake
      *
      * <p>Esse método atualiza a direção da snake, esse atributo é usado para atualizar a direção da cabeça da snake,
-     * quando existe um ponto de movimentação. Támbem é validado se a nova direção é valida, pois eu não posso mudar
+     * quando existe um ponto de movimentação. Também é validado se a nova direção é valida, pois eu não posso mudar
      * a direção da snake de uma para down e vice e versa, e nem de right para left e vice e versa</p>
      *
      * @param direction nova direção da snake.
@@ -435,7 +448,7 @@ public class Snake {
      * Adiciona um segmento novo ao final da snake
      *
      * <p>Esse método pe chamado quando a snake come uma fruta, então é adicionado um novo segmento ao final da lista
-     * de segmentos logicos e visuais. Pode ser observado que o novo segmento é gerado em uma posição não visível na
+     * de segmentos lógicos e visuais. Pode ser observado que o novo segmento é gerado em uma posição não visível na
      * tela, isso é necessário para não gerar nenhuma deformidade na snake. Posteriormente esse segmento será
      * atualizado pelo updateBodyPosition no caso da snake logica e syncVisualSegmentsWithLogicalSegments no caso
      * da snake visual</p>
@@ -462,14 +475,6 @@ public class Snake {
         return this.logicalSegments;
     }
 
-    public int getBodySizeWight() {
-        return bodySizeWight;
-    }
-
-    public int getBodySizeHeight() {
-        return bodySizeHeight;
-    }
-
     public List<SnakeSegment> getVisualSegments() {
         return visualSegments;
     }
@@ -478,24 +483,12 @@ public class Snake {
         return spriteSheetPixel;
     }
 
-    public void setSpriteSheetPixel(SnakeSprite spriteSheetPixel) {
-        this.spriteSheetPixel = spriteSheetPixel;
-    }
-
     public BufferedImage getSnakeEye() {
         return snakeEye;
     }
 
-    public void setSnakeEye(BufferedImage snakeEye) {
-        this.snakeEye = snakeEye;
-    }
-
     public BufferedImage getSnakeNose() {
         return snakeNose;
-    }
-
-    public void setSnakeNose(BufferedImage snakeNose) {
-        this.snakeNose = snakeNose;
     }
 
     public Map<String, Integer> getColorSnakeRGB() {

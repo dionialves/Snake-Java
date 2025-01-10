@@ -1,116 +1,128 @@
 package main.java.com.dionialves.snakeJava.entities;
 
-import main.java.com.dionialves.snakeJava.Game;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.InputStream;
 
-// Classe responsável pelo food do game!
+/**
+ * Representa o alimento no jogo Snake, com suporte a animações de tamanho e sombra.
+ */
 public class Foods {
+    private final Color SHADOW_COLOR = new Color(0, 0, 0, 30);
+
     private Rectangle body;
+    private boolean isAnimation = false;
+    private boolean hasShadow;
+
     private int normalSize;
     private int enlargedSize;
     private int currentSize;
-    // Através dos atributos abaixo eu consigo manipular o tamanho da foods, possibilitando assim criar um efeito de
-    // movimento, onde a food cresce e diminui de tempos em tempos
     private boolean isNormalSize = true;
-    private boolean isAnimation = false;
-    private boolean isShadow;
-    // Atributos que carregam a imagem do food.
-    // Futuramente preciso modificar a logica criando uma classe separada para gerenciar as sprites.
-    private BufferedImage spriteSheet;
-    private BufferedImage food;
-    private BufferedImage shadowFood;
 
-    public Foods(boolean isAnimation, boolean isShadow, int size) {
-        // Inicializações
+    private BufferedImage foodImage;
+    private BufferedImage shadowImage;
+
+    /**
+     * Construtor para inicializar o alimento.
+     *
+     * @param isAnimation  Indica se o alimento tem animação de tamanho.
+     * @param hasShadow   Indica se o alimento exibe uma sombra.
+     * @param size        Tamanho inicial do alimento.
+     */
+    public Foods(boolean isAnimation, boolean hasShadow, int size) {
         this.setNormalSize(size);
         this.setEnlargedSize(size + 4);
         this.setCurrentSize(size);
         this.setAnimation(isAnimation);
-        this.setShadow(isShadow);
-        // Por mais que o food seja representado visualmente por uma imagem, mantive na parte logica, com um retangulo
-        // assim consigo saber de forma fácil quando ele se colide com a snake, que também e um retângulo. Faço isso
-        // através do método "intersects".
-        this.setBody(new Rectangle(this.getNormalSize(), this.getNormalSize()));
+        this.setShadow(hasShadow);
 
-        // Esse bloco de código precisa ser reescrito quando eu for criar uma nova classe que irá gerenciar as sprites
-        // do food
-        try {
-            InputStream inputFile = getClass().getResourceAsStream("/main/resources/images/sprites-foods.png");
-            this.setSpriteSheet(ImageIO.read(inputFile));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.setBody(new Rectangle(size, size));
 
-        // Inicialização da imagem do food e da sombra do mesmo
-        this.setFood(this.getSprite(18, 146, 140, 140));
-        this.setShadowFood(
-                ShadowGenerator.addShadowToImage(this.getFood(),
-                        0,
-                        1,
-                        new Color(0,0,0, 30))
-        );
+        // Load das imagens do food, no caso sprite e a sombra
+        this.loadImages();
+
         // Aqui dou start a animação
-        if (this.isAnimation) {
-            Timer timer = new Timer(750, e -> toggleSize());
-            timer.start();
+        if (this.isAnimation()) {
+            this.startAnimation();
         }
     }
 
-    // Método principal da classe que desenha o food na tela.
+    /**
+     * Desenha o alimento no painel.
+     *
+     * @param g2d Contexto gráfico.
+     */
     public void draw(Graphics2D g2d) {
-        // Inicialização de algumas variáveis para deixar o código mais legível
-        int x = this.getBody().x;
-        int y = this.getBody().y;
-        int width = this.getCurrentSize();
-        int height = this.getCurrentSize();
+        int SHADOW_OFFSET_Y = 5;
 
-        // Se normalSize for true, pega as informações do tamanho normal do food, caso contrário pega o tamanho largo
-        // do food.
-        // Essa logica pode ser melhorada
-        if (isNormalSize) {
-            this.setCurrentSize(this.getNormalSize());
-        } else {
-            x -= 2;
-            y -= 2;
-            this.setCurrentSize(this.getEnlargedSize());
+        // Calcula as coordenadas com base no estado atual, ajustando o x e y em 2pixel. Isso é necessário para
+        // corrigir a posição do desenho, dependendo do estado da imagem.
+        int x = this.getBody().x - (this.isNormalSize() ? 0 : 2);
+        int y = this.getBody().y - (this.isNormalSize() ? 0 : 2);
+        this.setCurrentSize(this.isNormalSize() ? this.getNormalSize() : this.getEnlargedSize());
 
-        }
         if (this.isShadow()) {
             g2d.drawImage(
                     this.getShadowFood(),
                     x,
-                    y+5,
-                    width,
-                    height,
+                    y + SHADOW_OFFSET_Y,
+                    this.getCurrentSize(),
+                    this.getCurrentSize(),
                     null
             );
         }
         g2d.drawImage(
-                this.getFood(),
+                this.getFoodImage(),
                 x,
                 y,
-                width,
-                height,
+                this.getCurrentSize(),
+                this.getCurrentSize(),
                 null
         );
     }
 
-    public BufferedImage getSprite(int x, int y, int width, int height) {
-        return this.getSpriteSheet().getSubimage(x, y, width, height);
+    /**
+     * Carrega as imagens para o alimento e sua sombra.
+     */
+    public void loadImages() {
+        try {
+            InputStream inputFile = getClass().getResourceAsStream("/main/resources/images/sprites-foods.png");
+
+            if (inputFile == null) {
+                throw new IllegalArgumentException("Resource not found: /main/resources/images/sprites-foods.png");
+            }
+            BufferedImage spriteSheet = ImageIO.read(inputFile);
+            this.setFoodImage(spriteSheet.getSubimage(18, 146, 140, 140));
+            this.setShadowFood(
+                    ShadowGenerator.addShadowToImage(this.getFoodImage(),
+                            0,
+                            1,
+                            SHADOW_COLOR)
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Error loading images", e);
+        }
     }
 
-    // Alterna entre os tamanhos normal e ampliado
+    /**
+     * Inicia a animação do Food
+     */
+    private void startAnimation() {
+        int ANIMATION_DELAY = 750;
+
+        if (this.isAnimation) {
+            Timer timer = new Timer(ANIMATION_DELAY, _ -> toggleSize());
+            timer.start();
+        }
+    }
+
+    /**
+     * Alterna entre os tamanhos, normal e ampliado
+     */
     private void toggleSize() {
         this.setNormalSize(!this.isNormalSize());
-
-        // Faz a alteração do currentSize
-        this.setCurrentSize(this.isNormalSize() ? this.getNormalSize() : this.getEnlargedSize());
     }
 
     public Rectangle getBody() {
@@ -129,28 +141,20 @@ public class Foods {
         this.normalSize = normalSize;
     }
 
-    public BufferedImage getSpriteSheet() {
-        return spriteSheet;
+    public BufferedImage getFoodImage() {
+        return this.foodImage;
     }
 
-    public void setSpriteSheet(BufferedImage spriteSheet) {
-        this.spriteSheet = spriteSheet;
-    }
-
-    public BufferedImage getFood() {
-        return food;
-    }
-
-    public void setFood(BufferedImage food) {
-        this.food = food;
+    public void setFoodImage(BufferedImage food) {
+        this.foodImage = food;
     }
 
     public BufferedImage getShadowFood() {
-        return shadowFood;
+        return shadowImage;
     }
 
-    public void setShadowFood(BufferedImage shadowFood) {
-        this.shadowFood = shadowFood;
+    public void setShadowFood(BufferedImage shadowImage) {
+        this.shadowImage = shadowImage;
     }
 
     public boolean isNormalSize() {
@@ -186,10 +190,10 @@ public class Foods {
     }
 
     public boolean isShadow() {
-        return isShadow;
+        return hasShadow;
     }
 
     public void setShadow(boolean shadow) {
-        isShadow = shadow;
+        hasShadow = shadow;
     }
 }
